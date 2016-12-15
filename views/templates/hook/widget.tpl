@@ -1,5 +1,4 @@
-<?php
-/**
+{*
  * Tawk.to
  *
  * NOTICE OF LICENSE
@@ -14,8 +13,7 @@
  *
  * @copyright   Copyright (c) 2014 Tawk.to
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
-?>
+ *}
 <!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var $_Tawk_API={},$_Tawk_LoadStart=new Date();
