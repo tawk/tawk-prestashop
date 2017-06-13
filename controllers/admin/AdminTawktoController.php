@@ -18,80 +18,234 @@
  */
 
 if (!defined('_PS_VERSION_')) {
-	exit;
+    exit;
 }
 
-class AdminTawktoController extends ModuleAdminController {
-	public function __construct()
-	{
-		$this->bootstrap = true;
-		$this->display = 'view';
-		$this->meta_title = $this->l('Tawk.to');
+class AdminTawktoController extends ModuleAdminController
+{
+    public function __construct()
+    {
+        $this->bootstrap = true;
+        $this->display = 'view';
+        $this->meta_title = $this->l('Tawk.to');
 
-		parent::__construct();
-		if (!$this->module->active)
-			Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
-	}
+        parent::__construct();
+        if (!$this->module->active) {
+            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+        }
+    }
 
-	public function initToolBarTitle() {
-		$this->toolbar_title[] = $this->l('Tawk.to');
-		$this->toolbar_title[] = $this->l('Widget');
-	}
+    public function initToolBarTitle() {
+        $this->toolbar_title[] = $this->l('Tawk.to');
+        $this->toolbar_title[] = $this->l('Widget');
+    }
 
-	public function initToolbar() {
-		$r = parent::initToolbar();
+    public function initToolbar() 
+    {
+        $r = parent::initToolbar();
 
-		if(isset($this->toolbar_btn)) {
-			unset($this->toolbar_btn['back']);
-		} else {
-			unset($this->page_header_toolbar_btn['back']);
-		}
+        if(isset($this->toolbar_btn)) {
+            unset($this->toolbar_btn['back']);
+        } else {
+            unset($this->page_header_toolbar_btn['back']);
+        }
 
-		return $r;
-	}
+        return $r;
+    }
 
-	public function renderView() {
+    public function renderView()
+    {
+        // get all stores
+        $shops = Shop::getShops();
 
-		$this->tpl_view_vars = array(
-			'iframe_url' => $this->getIframeUrl(),
-			'base_url'   => $this->getBaseUrl(),
-			'controller' => $this->context->link->getAdminLink('AdminTawkto'),
-			'tab_id'     => (int)$this->context->controller->id
-		);
+        $shopId = 1;
+        $domain = $_SERVER['SERVER_NAME'];
+        foreach ($shops as $key => $shop) {
 
-		return parent::renderView();
-	}
+            if ($domain && $shop['domain']==$domain) {
+                $domain = trim($shop['domain']);
+                $shopId = intval($shop['id_shop']);
+            }
+        }
+        reset($shops);
 
-	private function getBaseUrl() {
-		return 'https://plugins.tawk.to';
-	}
+        $optKey = TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}";
+        if (!$displayOpts = Configuration::get($optKey)) {
+            $displayOpts = null;
+        }
+        // Check for visibility options
+        $sql = new DbQuery();
+        $sql->select('*');
+        $sql->from('configuration');
+        $sql->where('name = "'.TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
+        $result =  Db::getInstance()->executeS($sql);
+        $result = current($result);
+        $displayOpts = json_decode($result['value']);
 
-	private function getIframeUrl() {
-		return $this->getBaseUrl()
-			.'/generic/widgets'
-			.'?currentPageId='.Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID)
-			.'&currentWidgetId='.Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID);
-	}
+        $sameUser = true; // assuming there is only one admin by default
+        $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER."_{$shopId}");
+        if ($this->context->employee->id != $empId && $empId) {
+            $sameUser = false;
+        }
 
-	private static function idsAreCorrect($pageId, $widgetId) {
-		return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
-	}
+        $this->tpl_view_vars = array(
+                'iframe_url' => $this->getIframeUrl(),
+                'base_url'   => $this->getBaseUrl(),
+                'controller' => $this->context->link->getAdminLink('AdminTawkto'),
+                'tab_id'     => (int)$this->context->controller->id,
+                'shops'      => $shops,
+                'domain'     => $domain,
+                'display_opts' => $displayOpts,
+                'page_id'    => Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}"),
+                'widget_id'  => Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}"),
+                'same_user'  => $sameUser
+            );
 
-	public function ajaxProcessSetWidget() {
-		if(!isset($_POST['pageId']) || !isset($_POST['widgetId']) || !self::idsAreCorrect($_POST['pageId'], $_POST['widgetId'])) {
-			die(Tools::jsonEncode(array('success' => false)));
-		}
+        return parent::renderView();
+    }
 
-		Configuration::updateValue(TawkTo::TAWKTO_WIDGET_PAGE_ID, $_POST['pageId']);
-		Configuration::updateValue(TawkTo::TAWKTO_WIDGET_WIDGET_ID, $_POST['widgetId']);
+    private function getBaseUrl()
+    {
+        return 'https://plugins.tawk.to';
+    }
 
-		die(Tools::jsonEncode(array('success' => true)));
-	}
+    private function getIframeUrl()
+    {
+        $domain = $_SERVER['SERVER_NAME'];
+        $shopId = $this->context->shop->id;
 
-	public function ajaxProcessRemoveWidget() {
-		Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_PAGE_ID);
-		Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_WIDGET_ID);
+        // we still need to do this as prestashop is not fetching the correct context SHOP values
+        // when accessing the module admin via multistore
+        $shops = Shop::getShops();
+        if (count($shops) > 1) {
+            foreach ($shops as $key => $shop) {
+                if ($shop['domain']==$domain) {
+                    $shopId = intval($shop['id_shop']);
+                }
+            }
+        }
+        
+        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
+        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
+        return $this->getBaseUrl()
+            .'/generic/widgets'
+            .'?currentPageId='.Configuration::get($pageKey)
+            .'&currentWidgetId='.Configuration::get($widgetKey);
+    }
 
-		die(Tools::jsonEncode(array('success' => true)));
-	}
+    private static function idsAreCorrect($pageId, $widgetId)
+    {
+        return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
+    }
+
+    public function ajaxProcessSetWidget()
+    {
+        if(!isset($_POST['pageId']) || !isset($_POST['widgetId']) || !self::idsAreCorrect($_POST['pageId'], $_POST['widgetId'])) {
+            die(Tools::jsonEncode(array('success' => false)));
+        }
+
+        $shopId = 1;
+        $shops = Shop::getShops();
+        $domain = addslashes(trim($_REQUEST['domain']));
+        if (count($shops) && !empty($domain)) {
+            foreach ($shops as $key => $shop) {
+                if ($domain && $shop['domain']==$domain) {
+                    $shopId = intval($shop['id_shop']);
+                }
+            }
+        }
+        
+        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
+        Configuration::updateValue($pageKey, $_POST['pageId']);
+
+        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
+        Configuration::updateValue($widgetKey, $_POST['widgetId']);
+
+        $userKey = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
+        Configuration::updateValue($userKey, $this->context->employee->id);
+
+        die(Tools::jsonEncode(array('success' => true)));
+    }
+
+    public function ajaxProcessRemoveWidget()
+    {
+        $shopId = 1;
+        $shops = Shop::getShops();
+        $domain = addslashes(trim($_REQUEST['domain']));
+        if (count($shops) && !empty($domain)) {
+            foreach ($shops as $key => $shop) {
+                if ($domain && $shop['domain']==$domain) {
+                    $shopId = intval($shop['id_shop']);
+                }
+            }
+        }
+
+        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
+        Configuration::deleteByName($pageKey);
+
+        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
+        Configuration::deleteByName($widgetKey);
+
+        $userKey = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
+        Configuration::deleteByName($userKey);
+
+        die(Tools::jsonEncode(array('success' => true)));
+    }
+
+
+    public function ajaxProcessSetVisibility()
+    {
+        $shopId = 1;
+        $shops = Shop::getShops();
+        $domain = addslashes(trim($_REQUEST['domain']));
+        if (count($shops) && !empty($domain)) {
+            foreach ($shops as $key => $shop) {
+                if ($domain && $shop['domain']==$domain) {
+                    $shopId = intval($shop['id_shop']);
+                }
+            }
+        }
+
+        $jsonOpts = array(
+                'always_display' => false,
+                'show_onfrontpage' => false,
+                'show_oncategory' => false,
+                'show_onproduct' => false,
+                'show_oncustom' => array(),
+            );
+
+        if (isset($_REQUEST['options']) && !empty($_REQUEST['options'])) {
+            $options = explode('&', $_REQUEST['options']);
+            foreach ($options as $post) {
+                list($column, $value) = explode('=', $post);
+                switch ($column) {
+                    case 'show_oncustom':
+                        // replace newlines and returns with comma, and convert to array for saving
+                        $value = urldecode($value);
+                        $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
+                        $value = explode(",", $value);
+                        $value = (empty($value)||!$value)?array():$value;
+                        $jsonOpts[$column] = json_encode($value);
+                        break;
+                    
+                    case 'show_onfrontpage':
+                    case 'show_oncategory':
+                    case 'show_onproduct':
+                    case 'always_display':
+                    // default:
+                        $jsonOpts[$column] = ($value==1)?true:false;
+                        break;
+                }
+            }
+        }
+
+        $key = TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}";
+        Configuration::updateValue($key, json_encode($jsonOpts));
+
+        // not needed to log who set visibility
+        // $key = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
+        // Configuration::updateValue($key, $this->context->employee->id);
+
+        die(Tools::jsonEncode(array('success' => true)));
+    }
 }

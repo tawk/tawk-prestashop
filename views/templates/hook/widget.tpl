@@ -15,8 +15,7 @@
  * @copyright   Copyright (c) 2014 Tawk.to
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-?>
-<!--Start of Tawk.to Script-->
+?><!--Start of Tawk.to Script-->
 <script type="text/javascript">
 var $_Tawk_API={},$_Tawk_LoadStart=new Date();
 (function(){
@@ -27,5 +26,11 @@ s1.charset='UTF-8';
 s1.setAttribute('crossorigin','*');
 s0.parentNode.insertBefore(s1,s0);
 })();
+{if $customer_email != ''}
+   $_Tawk_API.visitor = {
+        name  : '{$customer_name}',
+        email : '{$customer_email}'
+    };
+{/if}
 </script>
 <!--End of Tawk.to Script-->
