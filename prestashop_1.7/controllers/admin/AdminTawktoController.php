@@ -87,7 +87,7 @@ class AdminTawktoController extends ModuleAdminController
         $sql = new DbQuery();
         $sql->select('*');
         $sql->from('configuration');
-        $sql->where('name = "'.TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
+        $sql->where('name = "'.pSQL(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
         $result =  Db::getInstance()->executeS($sql);
         $result = current($result);
         $displayOpts = json_decode($result['value']);
@@ -151,7 +151,7 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessSetWidget()
     {
         $fail = false;
-        if (!Tools::getIsset(Tools::getValue('pageId')) || !Tools::getIsset(Tools::getValue('widgetId'))) {
+        if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
             $fail = true;
         }
 

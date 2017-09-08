@@ -99,7 +99,7 @@ class Tawkto extends Module
         $sql = new DbQuery();
         $sql->select('*');
         $sql->from('configuration');
-        $sql->where('name = "'.self::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
+        $sql->where('name = "'.pSQL(self::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
         $result =  Db::getInstance()->executeS($sql);
         if ($result) {
             $result = current($result);
@@ -167,23 +167,33 @@ class Tawkto extends Module
             }
         }
 
-        // add customer details as visitor info
-        $customer_name = null;
-        $customer_email = null;
-        if (!is_null($this->context->customer->id)) {
-            $customer = $this->context->customer;
-            $customer_name = $customer->firstname.' '.$customer->lastname;
-            $customer_email = $customer->email;
-        }
-
         $this->context->smarty->assign(array(
                 'widget_id' => $widgetId,
                 'page_id'   => $pageId,
-                'customer_name'   => (!is_null($customer_name))?$customer_name:'',
-                'customer_email'   => (!is_null($customer_email))?$customer_email:'',
+                'visitor'   => $this->getVisitor()
             ));
 
         return $this->display(__FILE__, 'widget.tpl');
+    }
+
+    public function getVisitor()
+    {
+        // add customer details as visitor info
+        $name = null;
+        $email = null;
+        if (!is_null($this->context->customer->id)) {
+            $customer = $this->context->customer;
+            $name = $customer->firstname.' '.$customer->lastname;
+            $email = $customer->email;
+
+            $data = array(
+                    'name' => (!is_null($name))?$name:null,
+                    'email' => (!is_null($email))?$email:null
+                );
+            return json_encode($data);
+        }
+        
+        return null;
     }
 
     public function uninstall()
