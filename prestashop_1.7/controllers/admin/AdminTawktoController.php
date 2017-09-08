@@ -151,7 +151,7 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessSetWidget()
     {
         $fail = false;
-        if (!Tools::getIsset(Tools::getValue('pageId')) || !Tools::getIsset(Tools::getValue('widgetId'))) {
+        if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
             $fail = true;
         }
 
