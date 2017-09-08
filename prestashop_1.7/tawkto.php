@@ -99,7 +99,7 @@ class Tawkto extends Module
         $sql = new DbQuery();
         $sql->select('*');
         $sql->from('configuration');
-        $sql->where('name = "'.self::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
+        $sql->where('name = "'.pSQL(self::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
         $result =  Db::getInstance()->executeS($sql);
         if ($result) {
             $result = current($result);

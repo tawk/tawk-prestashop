@@ -87,7 +87,7 @@ class AdminTawktoController extends ModuleAdminController
         $sql = new DbQuery();
         $sql->select('*');
         $sql->from('configuration');
-        $sql->where('name = "'.TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
+        $sql->where('name = "'.pSQL(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
         $result =  Db::getInstance()->executeS($sql);
         $result = current($result);
         $displayOpts = json_decode($result['value']);
