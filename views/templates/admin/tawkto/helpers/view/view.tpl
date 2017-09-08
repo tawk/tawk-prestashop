@@ -27,14 +27,14 @@
     src=""
     style="min-height: 275px; width: 100%; border: none; margin: 5px 0; padding: 10px; background: #FFF;">
 </iframe>
-<input type="hidden" class="hidden" name="page_id" value="{$page_id}">
-<input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
+<input type="hidden" class="hidden" name="page_id" value="{$page_id|escape:'htmlall':'UTF-8'}">
+<input type="hidden" class="hidden" name="widget_id" value="{$widget_id|escape:'htmlall':'UTF-8'}">
 <script type="text/javascript">
-var domain = '{$domain}';
+var domain = '{$domain|escape:'htmlall':'UTF-8'}';
     var currentHost = window.location.protocol + "//" + domain,
         url = "{$iframe_url}&parentDomain=" + currentHost,
         baseUrl = '{$base_url}',
-        current_id_tab = '{$tab_id}',
+        current_id_tab = '{$tab_id|escape:'htmlall':'UTF-8'}',
         controller = '{$controller}';
 
     {literal}
@@ -210,7 +210,7 @@ var domain = '{$domain}';
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
                         {$whitelist = json_decode($display_opts->show_oncustom)}
                         <textarea name="show_oncustom" id="show_oncustom" cols="30" 
-                            rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
+                            rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'}{"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                         {/if}
