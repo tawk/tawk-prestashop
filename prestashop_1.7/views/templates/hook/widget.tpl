@@ -1,5 +1,4 @@
-<?php
-/**
+{*
  * tawk.to
  *
  * NOTICE OF LICENSE
@@ -12,10 +11,11 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
-?><!--Start of tawk.to Script-->
+ * @author    tawk.to <support(at)tawk.to>
+ * @copyright Copyright (c) 2014-2019 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *}
+<!--Start of tawk.to Script-->
 <script type="text/javascript">
 var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
 
