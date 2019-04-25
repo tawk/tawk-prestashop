@@ -2,16 +2,6 @@
 /**
  * Class AdminTawktoController
  *
- * @author    tawk.to <support(at)tawk.to>
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  Prestashop
- * @category  Module
- */
-
-/**
- * tawk.to
- *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0)
@@ -21,9 +11,12 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
+ *
  * @author    tawk.to <support(at)tawk.to>
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright Copyright (c) 2014-2019 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  Prestashop
+ * @category  Module
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -39,7 +32,7 @@ class AdminTawktoController extends ModuleAdminController
 
         parent::__construct();
         $this->meta_title = $this->l('tawk.to');
-        
+
         if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
         }
@@ -134,7 +127,7 @@ class AdminTawktoController extends ModuleAdminController
                 }
             }
         }
-        
+
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
         $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
         return $this->getBaseUrl()
@@ -173,7 +166,7 @@ class AdminTawktoController extends ModuleAdminController
                 }
             }
         }
-        
+
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
         Configuration::updateValue($pageKey, Tools::getValue('pageId'));
 
@@ -248,7 +241,7 @@ class AdminTawktoController extends ModuleAdminController
                         $value = (empty($value)||!$value)?array():$value;
                         $jsonOpts[$column] = json_encode($value);
                         break;
-                    
+
                     case 'show_onfrontpage':
                     case 'show_oncategory':
                     case 'show_onproduct':
