@@ -61,7 +61,7 @@ class Tawkto extends Module
     public function install()
     {
         // return parent::install() && $this->registerHook('displayBeforeBodyClosingTag') && $this->installTab();
-        return parent::install() && $this->registerHook('footer') && $this->installTab();
+        return parent::install() && $this->registerHook('displayFooter') && $this->installTab();
     }
 
     private function installTab()
