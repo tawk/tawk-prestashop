@@ -12,8 +12,8 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  * @author    tawk.to <support(at)tawk.to>
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright Copyright (c) 2014-2019 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -92,7 +92,7 @@ class Tawkto extends Module
         // function pSQL is prestashop's function for filtering/escaping input
         $sql->where('name = "'.pSQL(self::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
         $result =  Db::getInstance()->executeS($sql);
-        
+
         if ($result) {
             $result = current($result);
             $options = json_decode($result['value']);
@@ -154,7 +154,7 @@ class Tawkto extends Module
                 );
             return json_encode($data);
         }
-        
+
         return null;
     }
 
