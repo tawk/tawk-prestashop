@@ -117,7 +117,9 @@ class Tawkto extends Module
                 $showPages = json_decode($options->show_oncustom);
                 $show = false;
                 foreach ($showPages as $slug) {
-                    if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
+                    $current_page = (string) $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+                    $slug = str_ireplace(array('http://','https://'), '', $slug);
+                    if (stripos($current_page, $slug)!==false) {
                         $show = true;
                         break;
                     }
