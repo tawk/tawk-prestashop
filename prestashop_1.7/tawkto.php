@@ -2,16 +2,6 @@
 /**
  * Class Tawkto
  *
- * @author    tawk.to <support(at)tawk.to>
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- * @category  Prestashop
- * @category  Module
- */
-
-/**
- * tawk.to
- *
  * NOTICE OF LICENSE
  *
  * This source file is subject to the Open Software License (OSL 3.0)
@@ -21,9 +11,12 @@
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
+ *
  * @author    tawk.to <support(at)tawk.to>
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright Copyright (c) 2014-2019 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @category  Prestashop
+ * @category  Module
  */
 
 if (!defined('_PS_VERSION_')) {
@@ -61,7 +54,7 @@ class Tawkto extends Module
     public function install()
     {
         // return parent::install() && $this->registerHook('displayBeforeBodyClosingTag') && $this->installTab();
-        return parent::install() && $this->registerHook('footer') && $this->installTab();
+        return parent::install() && $this->registerHook('displayFooter') && $this->installTab();
     }
 
     private function installTab()
@@ -87,10 +80,10 @@ class Tawkto extends Module
         if (is_null($shopId)) {
             $shopId = 1;
         }
-        
+
         $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
         $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
-        
+
         if (empty($pageId) || empty($widgetId)) {
             return '';
         }
@@ -133,7 +126,7 @@ class Tawkto extends Module
                             return;
                         }
                     }
-                    
+
                     if ('index' == $this->context->controller->php_self) {
                         if (false==$options->show_onfrontpage) {
                             return;
@@ -148,7 +141,7 @@ class Tawkto extends Module
                 // hide on specified urls
                 $hide_pages = json_decode($options->hide_oncustom);
                 $show = true;
-                
+
                 foreach ($hide_pages as $slug) {
                     // we need to add htmlspecialchars due to slashes added when saving to database
                     $slug = (string) htmlspecialchars($slug);
@@ -192,7 +185,7 @@ class Tawkto extends Module
                 );
             return json_encode($data);
         }
-        
+
         return null;
     }
 
