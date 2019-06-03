@@ -152,7 +152,7 @@ class AdminTawktoController extends ModuleAdminController
             $fail = true;
         }
 
-        if ($fail) {
+        if (!$fail) {
             die(Tools::jsonEncode(array('success' => false)));
         }
 
@@ -209,7 +209,7 @@ class AdminTawktoController extends ModuleAdminController
     {
         $shopId = 1;
         $shops = Shop::getShops();
-        $domain = addslashes(trim($_REQUEST['domain']));
+        $domain = addslashes(trim(Tools::getValue('domain')));
         if (count($shops) && !empty($domain)) {
             foreach ($shops as $key => $shop) {
                 if ($domain && $shop['domain']==$domain) {
@@ -227,8 +227,8 @@ class AdminTawktoController extends ModuleAdminController
                 'show_oncustom' => array(),
             );
 
-        if (isset($_REQUEST['options']) && !empty($_REQUEST['options'])) {
-            $options = explode('&', $_REQUEST['options']);
+        if (!empty(Tools::getValue('options'))) {
+            $options = explode('&', Tools::getValue('options'));
             foreach ($options as $post) {
                 list($column, $value) = explode('=', $post);
                 switch ($column) {
@@ -237,9 +237,11 @@ class AdminTawktoController extends ModuleAdminController
                         // replace newlines and returns with comma, and convert to array for saving
                         $value = urldecode($value);
                         $value = str_ireplace(array("\r\n", "\r", "\n"), ',', $value);
+                    if ($value !== '')
+                    {
                         $value = explode(",", $value);
-                        $value = (empty($value)||!$value)?array():$value;
                         $jsonOpts[$column] = json_encode($value);
+                    }
                         break;
 
                     case 'show_onfrontpage':
@@ -263,3 +265,4 @@ class AdminTawktoController extends ModuleAdminController
         die(Tools::jsonEncode(array('success' => true)));
     }
 }
+
