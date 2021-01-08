@@ -30,8 +30,8 @@
 <input type="hidden" class="hidden" name="page_id" value="{$page_id}">
 <input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
 <script type="text/javascript">
-var domain = '{$domain}';
-    var currentHost = window.location.protocol + "//" + domain,
+    var domain = '{$domain}';
+    var currentHost = window.location.protocol + "//" + window.location.host,
         url = "{$iframe_url}&parentDomain=" + currentHost,
         baseUrl = '{$base_url}',
         current_id_tab = '{$tab_id}',
@@ -124,10 +124,10 @@ var domain = '{$domain}';
 <form id="module_form" action="" method="post">
     <div class="panel" id="fieldset_1">
         <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
-        <div class="form-wrapper row">            
+        <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title=""  data-original-title="Select which pages that chat is displayed in the site(s)">
                         Always show Tawk.To widget on every page
                     </span>
@@ -135,8 +135,8 @@ var domain = '{$domain}';
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="always_display" 
-                                id="always_display" value="1" 
+                            <input type="checkbox" name="always_display"
+                                id="always_display" value="1"
                                 {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
                         </label>
                     </div>
@@ -145,7 +145,7 @@ var domain = '{$domain}';
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on frontpage
                     </span>
@@ -153,8 +153,8 @@ var domain = '{$domain}';
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="show_onfrontpage" 
-                                id="show_onfrontpage" value="1" 
+                            <input type="checkbox" name="show_onfrontpage"
+                                id="show_onfrontpage" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
                         </label>
                     </div>
@@ -163,7 +163,7 @@ var domain = '{$domain}';
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on category pages
                     </span>
@@ -171,8 +171,8 @@ var domain = '{$domain}';
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="show_oncategory" 
-                                id="show_oncategory" value="1" 
+                            <input type="checkbox" name="show_oncategory"
+                                id="show_oncategory" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
                         </label>
                     </div>
@@ -181,7 +181,7 @@ var domain = '{$domain}';
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on product pages
                     </span>
@@ -189,8 +189,8 @@ var domain = '{$domain}';
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="show_onproduct" 
-                                id="show_onproduct" value="1" 
+                            <input type="checkbox" name="show_onproduct"
+                                id="show_onproduct" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
                         </label>
                     </div>
@@ -199,7 +199,7 @@ var domain = '{$domain}';
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on pages:
                     </span>
@@ -209,7 +209,7 @@ var domain = '{$domain}';
                         <label>
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
                         {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea name="show_oncustom" id="show_oncustom" cols="30" 
+                        <textarea name="show_oncustom" id="show_oncustom" cols="30"
                             rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
