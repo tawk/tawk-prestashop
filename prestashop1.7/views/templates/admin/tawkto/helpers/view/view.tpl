@@ -117,10 +117,10 @@ function removeWidget(e) {
 <form id="module_form" action="" method="post">
     <div class="panel" id="fieldset_1">
         <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
-        <div class="form-wrapper row">            
+        <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" data-original-title="Select which pages that chat is displayed in the site(s)">
                         Always show tawk.to widget on every page
                     </span>
@@ -128,8 +128,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="always_display" 
-                                id="always_display" value="1" 
+                            <input type="checkbox" name="always_display"
+                                id="always_display" value="1"
                                 {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
                         </label>
                     </div>
@@ -138,7 +138,7 @@ function removeWidget(e) {
 
             <div class="form-group col-lg-12">
                 <label class="control-label col-lg-3" for="hide_oncustom">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title=""  data-original-title="Select which pages that chat is not displayed">
                         Except on pages:
                     </span>
@@ -147,7 +147,7 @@ function removeWidget(e) {
                     <label>
                     {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
                     {$whitelist = json_decode($display_opts->hide_oncustom)}
-                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" 
+                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30"
                         rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
                     {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
@@ -163,7 +163,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on frontpage
                     </span>
@@ -171,8 +171,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onfrontpage" 
-                                id="show_onfrontpage" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_onfrontpage"
+                                id="show_onfrontpage" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
                         </label>
                     </div>
@@ -181,7 +181,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on category pages
                     </span>
@@ -189,8 +189,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_oncategory" 
-                                id="show_oncategory" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_oncategory"
+                                id="show_oncategory" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
                         </label>
                     </div>
@@ -199,7 +199,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on product pages
                     </span>
@@ -207,8 +207,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onproduct" 
-                                id="show_onproduct" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_onproduct"
+                                id="show_onproduct" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
                         </label>
                     </div>
@@ -217,7 +217,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on pages:
                     </span>
@@ -227,7 +227,7 @@ function removeWidget(e) {
                         <label>
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
                         {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" 
+                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30"
                             rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
@@ -298,7 +298,7 @@ jQuery("#always_display").change(function() {
         jQuery('.hide_specific').prop('disabled', true);
         jQuery('.show_specific').prop('disabled', false);
     }
-}); 
+});
 {/literal}
 });
 
