@@ -31,7 +31,7 @@
 <input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
 <script>
 var domain = '{$domain}';
-var currentHost = window.location.protocol + "//" + domain,
+var currentHost = window.location.protocol + "//" + window.location.host,
     url = "{$iframe_url}&parentDomain=" + currentHost,
     baseUrl = '{$base_url}',
     current_id_tab = '{$tab_id}',

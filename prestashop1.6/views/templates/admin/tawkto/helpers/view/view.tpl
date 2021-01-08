@@ -30,8 +30,8 @@
 <input type="hidden" class="hidden" name="page_id" value="{$page_id}">
 <input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
 <script type="text/javascript">
-var domain = '{$domain}';
-    var currentHost = window.location.protocol + "//" + domain,
+    var domain = '{$domain}';
+    var currentHost = window.location.protocol + "//" + window.location.host,
         url = "{$iframe_url}&parentDomain=" + currentHost,
         baseUrl = '{$base_url}',
         current_id_tab = '{$tab_id}',
