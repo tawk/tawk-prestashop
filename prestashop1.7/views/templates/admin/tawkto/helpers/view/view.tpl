@@ -22,6 +22,19 @@
 <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
 {/if}
 
+ <div class="panel" id="fieldset_1">
+    <div class="panel-heading"> <i class="icon-cogs"></i> Stores </div>
+    <div class="form-wrapper row">
+        <div class="form-group row">
+            <select id="stores" class="form-control">
+            {foreach $shops as $shop}
+                <option value={$shop['id']}>{$shop['name']}</option>
+            {/foreach}
+            </select>
+        </div>
+    </div>
+</div>
+
 <iframe
     id="tawkIframe"
     src=""
@@ -31,11 +44,13 @@
 <input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
 <script>
 var domain = '{$domain}';
-var currentHost = window.location.protocol + "//" + domain,
+var currentHost = window.location.protocol + "//" + window.location.host,
     url = "{$iframe_url}&parentDomain=" + currentHost,
     baseUrl = '{$base_url}',
     current_id_tab = '{$tab_id}',
-    controller = '{$controller}';
+    controller = '{$controller}',
+    shops = JSON.parse('{$shops|@json_encode}');
+var shopId;
 
 {literal}
 jQuery('#tawkIframe').attr('src', url);
@@ -56,7 +71,6 @@ window.addEventListener('message', function(e) {
 });
 
 function setWidget(e) {
-
     $.ajax({
         type     : 'POST',
         url      : controller,
@@ -68,14 +82,19 @@ function setWidget(e) {
             id_tab     : current_id_tab,
             pageId     : e.data.pageId,
             widgetId   : e.data.widgetId,
-            domain     : domain
+            domain     : domain,
+            shopId     : parseInt(shopId)
         },
         success : function(r) {
             if(r.success) {
                 e.source.postMessage({action: 'setDone'} , baseUrl);
 
-                $('input[name="page_id"]').val(e.data.pageId);
-                $('input[name="widget_id"]').val(e.data.widgetId);
+                shops[shopId] = {
+                    pageId : e.data.pageId,
+                    widgetId : e.data.widgetId
+                };
+
+                // TODO: fix the visibility warning toggle
                 $('#module_form, .visibility_warning').toggle();
             } else {
                 e.source.postMessage({action: 'setFail'} , baseUrl);
@@ -94,7 +113,8 @@ function removeWidget(e) {
             action     : 'removeWidget',
             ajax       : true,
             id_tab     : current_id_tab,
-            domain     : domain
+            domain     : domain,
+            shopId     : parseInt(shopId)
         },
         success : function(r) {
             if(r.success) {
@@ -114,13 +134,14 @@ function removeWidget(e) {
 
 <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
 
+{* TODO: Dynamically display visibility options depending on the selected store *}
 <form id="module_form" action="" method="post">
     <div class="panel" id="fieldset_1">
         <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
-        <div class="form-wrapper row">            
+        <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" data-original-title="Select which pages that chat is displayed in the site(s)">
                         Always show tawk.to widget on every page
                     </span>
@@ -128,8 +149,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="always_display" 
-                                id="always_display" value="1" 
+                            <input type="checkbox" name="always_display"
+                                id="always_display" value="1"
                                 {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
                         </label>
                     </div>
@@ -138,7 +159,7 @@ function removeWidget(e) {
 
             <div class="form-group col-lg-12">
                 <label class="control-label col-lg-3" for="hide_oncustom">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title=""  data-original-title="Select which pages that chat is not displayed">
                         Except on pages:
                     </span>
@@ -147,7 +168,7 @@ function removeWidget(e) {
                     <label>
                     {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
                     {$whitelist = json_decode($display_opts->hide_oncustom)}
-                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" 
+                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30"
                         rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
                     {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
@@ -163,7 +184,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on frontpage
                     </span>
@@ -171,8 +192,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onfrontpage" 
-                                id="show_onfrontpage" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_onfrontpage"
+                                id="show_onfrontpage" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
                         </label>
                     </div>
@@ -181,7 +202,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on category pages
                     </span>
@@ -189,8 +210,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_oncategory" 
-                                id="show_oncategory" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_oncategory"
+                                id="show_oncategory" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
                         </label>
                     </div>
@@ -199,7 +220,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on product pages
                     </span>
@@ -207,8 +228,8 @@ function removeWidget(e) {
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onproduct" 
-                                id="show_onproduct" value="1" 
+                            <input class="show_specific" type="checkbox" name="show_onproduct"
+                                id="show_onproduct" value="1"
                                 {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
                         </label>
                     </div>
@@ -217,7 +238,7 @@ function removeWidget(e) {
 
             <div class="form-group row">
                 <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true" 
+                    <span data-toggle="tooltip" data-html="true"
                         title="" >
                         Show on pages:
                     </span>
@@ -227,7 +248,7 @@ function removeWidget(e) {
                         <label>
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
                         {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" 
+                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30"
                             rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
@@ -255,6 +276,13 @@ jQuery(document).ready(function() {
     $('#module_form').hide();
 {/if}
 {literal}
+
+shopId = jQuery('#stores').val();
+jQuery('#stores').change(function (e) {
+    shopId = e.target.value;
+    // TODO: get store info from server then change iframe URL
+});
+
 // process the form
 $('#module_form').submit(function(event) {
     $.ajax({
@@ -270,7 +298,8 @@ $('#module_form').submit(function(event) {
             pageId     : $('input[name="page_id"]').val(),
             widgetId   : $('input[name="widget_id"]').val(),
             domain     : domain,
-            options    : $(this).serialize()
+            options    : $(this).serialize(),
+            shopId     : parseInt(shopId)
         },
         success : function(r) {
             if(r.success) {
@@ -298,7 +327,7 @@ jQuery("#always_display").change(function() {
         jQuery('.hide_specific').prop('disabled', true);
         jQuery('.show_specific').prop('disabled', false);
     }
-}); 
+});
 {/literal}
 });
 

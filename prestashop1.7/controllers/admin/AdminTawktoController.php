@@ -39,7 +39,7 @@ class AdminTawktoController extends ModuleAdminController
 
         parent::__construct();
         $this->meta_title = $this->l('tawk.to');
-        
+
         if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
         }
@@ -50,7 +50,7 @@ class AdminTawktoController extends ModuleAdminController
         $this->toolbar_title[] = $this->l('Widget');
     }
 
-    public function initToolbar() 
+    public function initToolbar()
     {
         $r = parent::initToolbar();
 
@@ -98,16 +98,19 @@ class AdminTawktoController extends ModuleAdminController
             $sameUser = false;
         }
 
+        $pageId = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
+        $widgetId = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
+
         $this->tpl_view_vars = array(
-                'iframe_url' => $this->getIframeUrl(),
+                'iframe_url' => $this->getIframeUrl($pageId, $widgetId),
                 'base_url'   => $this->getBaseUrl(),
                 'controller' => $this->context->link->getAdminLink('AdminTawkto'),
                 'tab_id'     => (int)$this->context->controller->id,
-                'shops'      => $shops,
+                'shops'      => $this->getStoreDetails(),
                 'domain'     => $domain,
                 'display_opts' => $displayOpts,
-                'page_id'    => Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}"),
-                'widget_id'  => Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}"),
+                'page_id'    => $pageId,
+                'widget_id'  => $widgetId,
                 'same_user'  => $sameUser
             );
 
@@ -119,28 +122,52 @@ class AdminTawktoController extends ModuleAdminController
         return 'https://plugins.tawk.to';
     }
 
-    private function getIframeUrl()
+    private function getIframeUrl($pageId, $widgetId)
     {
-        $domain = $_SERVER['SERVER_NAME'];
-        $shopId = $this->context->shop->id;
-
-        // we still need to do this as prestashop is not fetching the correct context SHOP values
-        // when accessing the module admin via multistore
-        $shops = Shop::getShops();
-        if (count($shops) > 1) {
-            foreach ($shops as $key => $shop) {
-                if ($shop['domain']==$domain) {
-                    $shopId = intval($shop['id_shop']);
-                }
-            }
+        $pageIdParam = 'currentPageId=';
+        $widgetIdParam = 'currentWidgetId=';
+        if ($pageId) {
+            $pageIdParam .= $pageId;
         }
-        
-        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
-        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
+
+        if ($widgetId) {
+            $widgetIdParam .= $widgetId;
+        }
+
         return $this->getBaseUrl()
             .'/generic/widgets'
-            .'?currentPageId='.Configuration::get($pageKey)
-            .'&currentWidgetId='.Configuration::get($widgetKey);
+            .'?'.$widgetIdParam
+            .'&'.$pageIdParam
+            .'&selectText=Store';
+    }
+
+    private function getStoreDetails()
+    {
+        $isMultistore = Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE');
+        if (!$isMultistore) {
+            return null;
+        }
+
+        $domain = $_SERVER['SERVER_NAME'];
+
+        $shops = Shop::getShops();
+        $details = array();
+        if (count($shops) > 1) {
+            foreach ($shops as $key => $shop) {
+                $shopId = $shop['id_shop'];
+                $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
+                $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
+                $details[$shopId] = array(
+                    'id' => intval($shopId),
+                    'name' => $shop['name'],
+                    'current' => array(
+                        'pageId' => Configuration::get($pageKey),
+                        'widgetId' => Configuration::get($widgetKey)
+                    )
+                );
+            }
+        }
+        return $details;
     }
 
     private static function idsAreCorrect($pageId, $widgetId)
@@ -154,17 +181,8 @@ class AdminTawktoController extends ModuleAdminController
             die(Tools::jsonEncode(array('success' => false)));
         }
 
-        $shopId = 1;
-        $shops = Shop::getShops();
-        $domain = addslashes(trim($_REQUEST['domain']));
-        if (count($shops) && !empty($domain)) {
-            foreach ($shops as $key => $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = intval($shop['id_shop']);
-                }
-            }
-        }
-        
+        $shopId = $_POST['shopId'];
+
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
         Configuration::updateValue($pageKey, $_POST['pageId']);
 
@@ -179,16 +197,7 @@ class AdminTawktoController extends ModuleAdminController
 
     public function ajaxProcessRemoveWidget()
     {
-        $shopId = 1;
-        $shops = Shop::getShops();
-        $domain = addslashes(trim($_REQUEST['domain']));
-        if (count($shops) && !empty($domain)) {
-            foreach ($shops as $key => $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = intval($shop['id_shop']);
-                }
-            }
-        }
+        $shopId = $_POST['shopId'];
 
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
         Configuration::deleteByName($pageKey);
@@ -205,16 +214,7 @@ class AdminTawktoController extends ModuleAdminController
 
     public function ajaxProcessSetVisibility()
     {
-        $shopId = 1;
-        $shops = Shop::getShops();
-        $domain = addslashes(trim($_REQUEST['domain']));
-        if (count($shops) && !empty($domain)) {
-            foreach ($shops as $key => $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = intval($shop['id_shop']);
-                }
-            }
-        }
+        $shopId = $_POST['shopId'];
 
         $jsonOpts = array(
                 'always_display' => false,
@@ -239,7 +239,7 @@ class AdminTawktoController extends ModuleAdminController
                         $value = (empty($value)||!$value)?array():$value;
                         $jsonOpts[$column] = json_encode($value);
                         break;
-                    
+
                     case 'show_onfrontpage':
                     case 'show_oncategory':
                     case 'show_onproduct':
