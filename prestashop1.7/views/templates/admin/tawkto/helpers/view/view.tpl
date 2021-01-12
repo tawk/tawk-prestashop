@@ -37,9 +37,10 @@
     <div class="panel-heading"> <i class="icon-cogs"></i> Configure Widget</div>
     <div class="form-wrapper row">
         <div class="form-group row">
-            <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none" class="alert alert-warning">
+            <div id="widget_already_set" class="alert alert-warning" style="display: none">
                 Widget set by other user
             </div>
+            <div id="widget_error" class="alert alert-danger" style="display: none"></div>
             <iframe
                 id="tawkIframe"
                 src=""
@@ -49,11 +50,11 @@
     </div>
 </div>
 
-<div id="visibility_warning" style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
-
-<form id="module_form" action="" method="post">
-    <div class="panel" id="fieldset_3">
-        <div class="panel-heading"> <i class="icon-eye-open"></i> Visibility Settings </div>
+<div class="panel" id="fieldset_3">
+    <div class="panel-heading"> <i class="icon-eye-open"></i> Visibility Settings </div>
+    <div id="visibility_warning" class="alert alert-warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
+    <div id="visibility_error" class="alert alert-danger" style="display: none;"></div>
+    <form id="module_form" action="" method="post">
         <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
@@ -159,12 +160,12 @@
 
         </div><!-- end form-wrapper -->
         <div class="panel-footer">
-            <div id="optionsSuccessMessage" style="width: 50%; float: left; background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success">Successfully set widget options to your site</div>
+            <div id="optionsSuccessMessage" class="alert alert-success">Successfully set widget options to your site</div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 <script type="text/javascript">
     var currentHost = window.location.protocol + "//" + window.location.host;
@@ -183,8 +184,8 @@
         jQuery('#stores').change(function (e) {
             shopId = e.target.value;
             domain = shops[shopId].domain;
-            getStoreVisibilityOpts();
             getStoreWidget();
+            getStoreVisibilityOpts();
             toggleVisibilityForm();
         });
 
@@ -219,14 +220,15 @@
 
     // Functions
     function setup() {
-        setDefaultVisibilityFields();
-        getStoreVisibilityOpts();
         getStoreWidget();
+        getStoreVisibilityOpts();
 
         $('#module_form').hide();
     }
 
     function getStoreWidget() {
+        var errEl = $('#widget_error');
+        errEl.hide();
         var payload = {
             controller : 'AdminTawkto',
             action : 'getStoreWidget',
@@ -234,7 +236,7 @@
             shopId : parseInt(shopId)
         };
         $.get(controller, payload)
-            .done(function (data) {
+            .success(function (data) {
                 var result = JSON.parse(data);
                 var updatedUrl = new URL(url);
                 updatedUrl.searchParams.set('currentWidgetId', result.widgetId || '');
@@ -245,10 +247,17 @@
 
                 toggleSameUserWarning(result.sameUser);
                 toggleVisibilityForm(result.widgetId, result.pageId);
+            })
+            .error(function (xhr, status, err) {
+                errEl.html('Failed to retrieve current store\'s widget.');
+                errEl.show();
             });
     }
 
     function getStoreVisibilityOpts() {
+        var errEl = $('#visibility_error');
+        errEl.hide();
+
         var payload = {
             controller : 'AdminTawkto',
             action : 'getStoreVisibilityOpts',
@@ -256,7 +265,7 @@
             shopId : parseInt(shopId)
         };
         $.get(controller, payload)
-            .done(function (data) {
+            .success(function (data) {
                 var result = JSON.parse(data);
 
                 if (!result) {
