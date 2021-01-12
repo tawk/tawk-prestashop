@@ -186,7 +186,6 @@
             domain = shops[shopId].domain;
             getStoreWidget();
             getStoreVisibilityOpts();
-            toggleVisibilityForm();
         });
 
         $('#module_form').submit(setVisibility);
@@ -408,4 +407,3 @@
     {/literal}
 
 </script>
-

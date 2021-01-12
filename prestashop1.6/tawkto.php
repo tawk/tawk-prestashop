@@ -13,7 +13,7 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2014 Tawk.to
+ * @copyright   Copyright (c) 2021 Tawk.to
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -79,8 +79,7 @@ class Tawkto extends Module
         }
         $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
         $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
-        // $widgetOptions = Configuration::get(self::TAWKTO_WIDGET_OPTS."_{$shopId}");
-        // 
+
         if(empty($pageId) || empty($widgetId)) {
             return '';
         }
@@ -91,38 +90,73 @@ class Tawkto extends Module
         $sql->from('configuration');
         $sql->where('name = "'.self::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
         $result =  Db::getInstance()->executeS($sql);
-        
+
         if ($result) {
             $result = current($result);
             $options = json_decode($result['value']);
+            $current_page = (string) $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
             // prepare visibility
             if (false==$options->always_display) {
-                if ('index' == $this->context->controller->php_self) {
-                    if (false==$options->show_onfrontpage) {
-                        return;
-                    }
-                }
-                if ('category' == $this->context->controller->php_self) {
-                    if (false==$options->show_oncategory) {
-                        return;
-                    }
-                }
-                if ('product' == $this->context->controller->php_self) {
-                    if (false==$options->show_onproduct) {
-                        return;
-                    }
-                }
+
+                // show on specified urls
                 $showPages = json_decode($options->show_oncustom);
                 $show = false;
                 foreach ($showPages as $slug) {
-                    if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
-                        $show = true;
-                        break;
+
+                    if (!empty($slug)) {
+                        $slug = str_ireplace(array('http://','https://'), '', $slug);
+                        if (stripos($current_page, $slug)!==false) {
+                            $show = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$show) {
+                    if ('product' == $this->context->controller->php_self) {
+                        if (false==$options->show_onproduct) {
+                            return;
+                        }
+                    }
+
+                    if ('category' == $this->context->controller->php_self) {
+                        if (false==$options->show_oncategory) {
+                            return;
+                        }
+                    }
+
+                    if ('index' == $this->context->controller->php_self) {
+                        if (false==$options->show_onfrontpage) {
+                            return;
+                        }
                     }
                 }
 
                 if (!$show && !in_array($this->context->controller->php_self, array('index', 'category', 'product'))) {
+                    return;
+                }
+            } else {
+
+                // hide on specified urls
+                $hide_pages = json_decode($options->hide_oncustom);
+                $show = true;
+
+                foreach ($hide_pages as $slug) {
+
+                    // we need to add htmlspecialchars due to slashes added when saving to database
+                    $slug = (string) htmlspecialchars($slug);
+                    if (!empty($slug)) {
+
+                        $slug = str_ireplace(array('http://','https://'), '', $slug);
+                        if (stripos($current_page, $slug)!==false) {
+                            $show = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (!$show) {
                     return;
                 }
             }
