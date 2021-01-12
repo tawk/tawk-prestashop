@@ -18,13 +18,9 @@
 -->
 {include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
 
-{* {if !$same_user}
-<div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
-{/if} *}
-
 {* Select store section *}
 <div class="panel" id="fieldset_1">
-    <div class="panel-heading"> <i class="icon-cogs"></i> Stores </div>
+    <div class="panel-heading"> <i class="icon-shopping-cart"></i> Stores </div>
     <div class="form-wrapper row">
         <div class="form-group row">
             <select id="stores" class="form-control">
@@ -37,10 +33,13 @@
 </div>
 
 {* Select property and widget section *}
-<div class="panel" id="fieldset_1">
+<div class="panel" id="fieldset_2">
     <div class="panel-heading"> <i class="icon-cogs"></i> Configure Widget</div>
     <div class="form-wrapper row">
         <div class="form-group row">
+            <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none" class="alert alert-warning">
+                Widget set by other user
+            </div>
             <iframe
                 id="tawkIframe"
                 src=""
@@ -50,12 +49,11 @@
     </div>
 </div>
 
-{* <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div> *}
+<div id="visibility_warning" style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
 
-{* TODO: Dynamically display visibility options depending on the selected store *}
 <form id="module_form" action="" method="post">
-    <div class="panel" id="fieldset_1">
-        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
+    <div class="panel" id="fieldset_3">
+        <div class="panel-heading"> <i class="icon-eye-open"></i> Visibility Settings </div>
         <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
@@ -67,15 +65,13 @@
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input type="checkbox" name="always_display"
-                                id="always_display" value="1"
-                                {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
+                            <input type="checkbox" name="always_display" id="always_display" value="1" />
                         </label>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group col-lg-12">
+            <div class="form-group row">
                 <label class="control-label col-lg-3" for="hide_oncustom">
                     <span data-toggle="tooltip" data-html="true"
                         title=""  data-original-title="Select which pages that chat is not displayed">
@@ -84,13 +80,7 @@
                 </label>
                 <div class="col-lg-6 control-label">
                     <label>
-                    {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
-                    {$whitelist = json_decode($display_opts->hide_oncustom)}
-                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30"
-                        rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
-                    {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
-                    {/if}
                     </label>
                     <br>
                     <p style="text-align: justify;">
@@ -110,9 +100,7 @@
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onfrontpage"
-                                id="show_onfrontpage" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
+                            <input class="show_specific" type="checkbox" name="show_onfrontpage" id="show_onfrontpage" value="1" />
                         </label>
                     </div>
                 </div>
@@ -128,9 +116,7 @@
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_oncategory"
-                                id="show_oncategory" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
+                            <input class="show_specific" type="checkbox" name="show_oncategory" id="show_oncategory" value="1" />
                         </label>
                     </div>
                 </div>
@@ -146,9 +132,7 @@
                 <div class="col-lg-9">
                     <div class="radio ">
                         <label>
-                            <input class="show_specific" type="checkbox" name="show_onproduct"
-                                id="show_onproduct" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
+                            <input class="show_specific" type="checkbox" name="show_onproduct" id="show_onproduct" value="1" />
                         </label>
                     </div>
                 </div>
@@ -164,13 +148,7 @@
                 <div class="col-lg-9">
                     <div class="text">
                         <label>
-                        {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
-                        {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30"
-                            rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
-                        {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
-                        {/if}
                         </label>
                         <br>
                         Add URLs to pages in which you would like to show the widget.<br>
@@ -188,7 +166,7 @@
     </div>
 </form>
 
-<script>
+<script type="text/javascript">
     var currentHost = window.location.protocol + "//" + window.location.host;
     var url = "{$iframe_url}&parentDomain=" + currentHost;
     var baseUrl = '{$base_url}';
@@ -198,37 +176,30 @@
     var shopId, domain;
 
     jQuery(document).ready(function() {
-        {literal}
-            shopId = jQuery('#stores').val();
+        shopId = jQuery('#stores').val();
+        domain = shops[shopId].domain;
+        setup();
+
+        jQuery('#stores').change(function (e) {
+            shopId = e.target.value;
             domain = shops[shopId].domain;
-            setup();
+            getStoreVisibilityOpts();
+            getStoreWidget();
+            toggleVisibilityForm();
+        });
 
-            jQuery('#stores').change(function (e) {
-                shopId = e.target.value;
-                domain = shops[shopId].domain;
-                getStoreVisibilityOpts();
-                getStoreWidget();
-            });
+        $('#module_form').submit(setVisibility);
 
-            // process the form
-            $('#module_form').submit(setVisibility);
-
-            if (jQuery("#always_display").prop("checked")) {
+        jQuery("#always_display").change(function() {
+            if (this.checked) {
+                jQuery('.hide_specific').prop('disabled', false);
                 jQuery('.show_specific').prop('disabled', true);
             } else {
                 jQuery('.hide_specific').prop('disabled', true);
+                jQuery('.show_specific').prop('disabled', false);
             }
+        });
 
-            jQuery("#always_display").change(function() {
-                if (this.checked) {
-                    jQuery('.hide_specific').prop('disabled', false);
-                    jQuery('.show_specific').prop('disabled', true);
-                } else {
-                    jQuery('.hide_specific').prop('disabled', true);
-                    jQuery('.show_specific').prop('disabled', false);
-                }
-            });
-        {/literal}
     });
 
     {literal}
@@ -248,8 +219,11 @@
 
     // Functions
     function setup() {
+        setDefaultVisibilityFields();
         getStoreVisibilityOpts();
         getStoreWidget();
+
+        $('#module_form').hide();
     }
 
     function getStoreWidget() {
@@ -268,6 +242,9 @@
 
                 url = updatedUrl.href;
                 jQuery('#tawkIframe').attr('src', url);
+
+                toggleSameUserWarning(result.sameUser);
+                toggleVisibilityForm(result.widgetId, result.pageId);
             });
     }
 
@@ -281,7 +258,32 @@
         $.get(controller, payload)
             .done(function (data) {
                 var result = JSON.parse(data);
-                // TODO: bind the options to their respective elements
+
+                if (!result) {
+                    setDefaultVisibilityFields();
+                } else {
+                    // bind values to specified elements
+                    for (var [key, value] of Object.entries(result)) {
+                        var el = $('#' + key);
+                        var tag = el.prop('tagName');
+                        var type = el.prop('type');
+
+                        if (tag === 'INPUT' && (type === 'checkbox' || type === 'radio')) {
+                            el.prop('checked', value);
+                        } else if (tag === 'TEXTAREA') {
+                            if (typeof value === 'string') {
+                                value = JSON.parse(value);
+                            }
+                            el.val(value.join('\r\n'));
+                        } else {
+                            el.val(value);
+                        }
+
+                        // trigers change event
+                        el.trigger('change');
+                    }
+                }
+
             });
     }
 
@@ -303,9 +305,8 @@
             success : function(r) {
                 if(r.success) {
                     e.source.postMessage({action: 'setDone'} , baseUrl);
-
-                    // TODO: fix the visibility warning toggle
-                    $('#module_form, .visibility_warning').toggle();
+                    toggleVisibilityForm(e.data.pageId, e.data.widgetId);
+                    toggleSameUserWarning(true);
                 } else {
                     e.source.postMessage({action: 'setFail'} , baseUrl);
                 }
@@ -329,10 +330,7 @@
             success : function(r) {
                 if (r.success) {
                     e.source.postMessage({action: 'removeDone'} , baseUrl);
-
-                    $('input[name="page_id"]').val(e.data.pageId);
-                    $('input[name="widget_id"]').val(e.data.widgetId);
-                    $('#module_form, .visibility_warning').toggle();
+                    toggleVisibilityForm();
                 } else {
                     e.source.postMessage({action: 'removeFail'} , baseUrl);
                 }
@@ -365,6 +363,30 @@
 
         // stop the form from submitting the normal way and refreshing the page
         event.preventDefault();
+    }
+
+    function toggleVisibilityForm(pageId, widgetId) {
+        if (pageId && widgetId) {
+            $('#visibility_warning').hide();
+            $('#module_form').show();
+        } else {
+            $('#visibility_warning').show();
+            $('#module_form').hide();
+        }
+    }
+
+    function toggleSameUserWarning(sameUser) {
+        if (sameUser) {
+            $('#widget_already_set').hide();
+        } else {
+            $('#widget_already_set').show();
+        }
+    }
+
+    function setDefaultVisibilityFields() {
+        var alwaysDisplayEl = $('#always_display');
+        alwaysDisplayEl.prop('checked', true);
+        alwaysDisplayEl.trigger('change');
     }
     {/literal}
 
