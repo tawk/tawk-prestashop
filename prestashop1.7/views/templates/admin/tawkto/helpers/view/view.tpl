@@ -12,7 +12,7 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2014 tawk.to
+ * @copyright   Copyright (c) 2021 tawk.to
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 -->
@@ -160,7 +160,7 @@
 
         </div><!-- end form-wrapper -->
         <div class="panel-footer">
-            <div id="optionsSuccessMessage" class="alert alert-success">Successfully set widget options to your site</div>
+            <div id="optionsSuccessMessage" class="alert alert-success" style="display: none">Successfully set widget options to your site</div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>

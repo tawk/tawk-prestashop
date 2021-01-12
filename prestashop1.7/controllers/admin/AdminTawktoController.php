@@ -90,7 +90,7 @@ class AdminTawktoController extends ModuleAdminController
     {
         $shops = Shop::getShops();
         $details = array();
-        if (count($shops) > 1) {
+        if (count($shops) > 0) {
             foreach ($shops as $key => $shop) {
                 $shopId = $shop['id_shop'];
                 $details[$shopId] = array(
@@ -118,13 +118,13 @@ class AdminTawktoController extends ModuleAdminController
         $shopId = $_POST['shopId'];
 
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
-        Configuration::updateValue($pageKey, $_POST['pageId']);
+        Configuration::updateGlobalValue($pageKey, $_POST['pageId'], false, 0, 0);
 
         $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
-        Configuration::updateValue($widgetKey, $_POST['widgetId']);
+        Configuration::updateGlobalValue($widgetKey, $_POST['widgetId'], false, 0, 0);
 
         $userKey = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
-        Configuration::updateValue($userKey, $this->context->employee->id);
+        Configuration::updateGlobalValue($userKey, $this->context->employee->id, false, 0, 0);
 
         die(Tools::jsonEncode(array('success' => true)));
     }
@@ -185,7 +185,7 @@ class AdminTawktoController extends ModuleAdminController
         }
 
         $key = TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}";
-        Configuration::updateValue($key, json_encode($jsonOpts));
+        Configuration::updateGlobalValue($key, json_encode($jsonOpts), false, 0, 0);
 
         die(Tools::jsonEncode(array('success' => true)));
     }
@@ -211,7 +211,7 @@ class AdminTawktoController extends ModuleAdminController
 
     public function displayAjaxGetStoreWidget() {
         if (!isset($_GET['shopId'])) {
-            die(Tools::jsonEncode($result));
+            die(Tools::jsonEncode(null));
         }
 
         $shopId = $_GET['shopId'];
