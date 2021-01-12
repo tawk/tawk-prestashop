@@ -395,9 +395,15 @@
     }
 
     function setDefaultVisibilityFields() {
+        // clear form field values
+        var formEl = $('#module_form');
+        formEl.find('input[type=checkbox], input[type=radio]').prop('checked', false)
+        formEl.find('input[type=text], textarea').val('');
+
         var alwaysDisplayEl = $('#always_display');
         alwaysDisplayEl.prop('checked', true);
         alwaysDisplayEl.trigger('change');
+
     }
     {/literal}
 
