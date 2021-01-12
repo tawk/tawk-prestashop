@@ -65,53 +65,12 @@ class AdminTawktoController extends ModuleAdminController
 
     public function renderView()
     {
-        // get all stores
-        $shops = Shop::getShops();
-
-        $shopId = 1;
-        $domain = $_SERVER['SERVER_NAME'];
-        foreach ($shops as $key => $shop) {
-
-            if ($domain && $shop['domain']==$domain) {
-                $domain = trim($shop['domain']);
-                $shopId = intval($shop['id_shop']);
-            }
-        }
-        reset($shops);
-
-        $optKey = TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}";
-        if (!$displayOpts = Configuration::get($optKey)) {
-            $displayOpts = null;
-        }
-        // Check for visibility options
-        $sql = new DbQuery();
-        $sql->select('*');
-        $sql->from('configuration');
-        $sql->where('name = "'.TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}".'"');
-        $result =  Db::getInstance()->executeS($sql);
-        $result = current($result);
-        $displayOpts = json_decode($result['value']);
-
-        $sameUser = true; // assuming there is only one admin by default
-        $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER."_{$shopId}");
-        if ($this->context->employee->id != $empId && $empId) {
-            $sameUser = false;
-        }
-
-        $pageId = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
-        $widgetId = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
-
         $this->tpl_view_vars = array(
-                'iframe_url' => $this->getIframeUrl($pageId, $widgetId),
+                'iframe_url' => $this->getIframeUrl(),
                 'base_url'   => $this->getBaseUrl(),
                 'controller' => $this->context->link->getAdminLink('AdminTawkto'),
                 'tab_id'     => (int)$this->context->controller->id,
-                'shops'      => $this->getStoreDetails(),
-                'domain'     => $domain,
-                'display_opts' => $displayOpts,
-                'page_id'    => $pageId,
-                'widget_id'  => $widgetId,
-                'same_user'  => $sameUser
+                'shops'      => $this->getStoreDetails()
             );
 
         return parent::renderView();
@@ -122,48 +81,22 @@ class AdminTawktoController extends ModuleAdminController
         return 'https://plugins.tawk.to';
     }
 
-    private function getIframeUrl($pageId, $widgetId)
+    private function getIframeUrl()
     {
-        $pageIdParam = 'currentPageId=';
-        $widgetIdParam = 'currentWidgetId=';
-        if ($pageId) {
-            $pageIdParam .= $pageId;
-        }
-
-        if ($widgetId) {
-            $widgetIdParam .= $widgetId;
-        }
-
-        return $this->getBaseUrl()
-            .'/generic/widgets'
-            .'?'.$widgetIdParam
-            .'&'.$pageIdParam
-            .'&selectText=Store';
+        return $this->getBaseUrl().'/generic/widgets?currentPageId=&currentWidgetId=';
     }
 
     private function getStoreDetails()
     {
-        $isMultistore = Configuration::get('PS_MULTISHOP_FEATURE_ACTIVE');
-        if (!$isMultistore) {
-            return null;
-        }
-
-        $domain = $_SERVER['SERVER_NAME'];
-
         $shops = Shop::getShops();
         $details = array();
         if (count($shops) > 1) {
             foreach ($shops as $key => $shop) {
                 $shopId = $shop['id_shop'];
-                $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
-                $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
                 $details[$shopId] = array(
                     'id' => intval($shopId),
                     'name' => $shop['name'],
-                    'current' => array(
-                        'pageId' => Configuration::get($pageKey),
-                        'widgetId' => Configuration::get($widgetKey)
-                    )
+                    'domain' => trim($shop['domain'])
                 );
             }
         }
@@ -175,6 +108,7 @@ class AdminTawktoController extends ModuleAdminController
         return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
     }
 
+    // Controller Functions
     public function ajaxProcessSetWidget()
     {
         if(!isset($_POST['pageId']) || !isset($_POST['widgetId']) || !self::idsAreCorrect($_POST['pageId'], $_POST['widgetId'])) {
@@ -210,7 +144,6 @@ class AdminTawktoController extends ModuleAdminController
 
         die(Tools::jsonEncode(array('success' => true)));
     }
-
 
     public function ajaxProcessSetVisibility()
     {
@@ -259,5 +192,51 @@ class AdminTawktoController extends ModuleAdminController
         // Configuration::updateValue($key, $this->context->employee->id);
 
         die(Tools::jsonEncode(array('success' => true)));
+    }
+
+    public function displayAjaxGetStoreVisibilityOpts() {
+        $result = null;
+        if (!isset($_GET['shopId'])) {
+            die(Tools::jsonEncode($result));
+        }
+
+        $shopId = $_GET['shopId'];
+        $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}");
+
+        // this prevents $result to return $opts as 'false'.
+        if (!$opts) {
+            die(Tools::jsonEncode($result));
+        }
+        $result = $opts;
+
+        // already json encoded
+        die($result);
+    }
+
+    public function displayAjaxGetStoreWidget() {
+        if (!isset($_GET['shopId'])) {
+            die(Tools::jsonEncode($result));
+        }
+
+        $shopId = $_GET['shopId'];
+        $result = array();
+
+        $result['sameUser'] = true; // assuming there is only one admin by default
+        $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER."_{$shopId}");
+        if ($this->context->employee->id != $empId && $empId) {
+            $result['sameUser'] = false;
+        }
+
+        $pageId = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
+        if ($pageId) {
+            $result['pageId'] = $pageId;
+        }
+
+        $widgetId = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
+        if ($widgetId) {
+            $result['widgetId'] = $widgetId;
+        }
+
+        die(Tools::jsonEncode($result));
     }
 }

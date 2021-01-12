@@ -18,11 +18,12 @@
 -->
 {include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
 
-{if !$same_user}
+{* {if !$same_user}
 <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
-{/if}
+{/if} *}
 
- <div class="panel" id="fieldset_1">
+{* Select store section *}
+<div class="panel" id="fieldset_1">
     <div class="panel-heading"> <i class="icon-cogs"></i> Stores </div>
     <div class="form-wrapper row">
         <div class="form-group row">
@@ -35,104 +36,21 @@
     </div>
 </div>
 
-<iframe
-    id="tawkIframe"
-    src=""
-    style="min-height: 275px; width: 100%; border: none; margin: 5px 0; padding: 10px; background: #FFF;">
-</iframe>
-<input type="hidden" class="hidden" name="page_id" value="{$page_id}">
-<input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
-<script>
-var domain = '{$domain}';
-var currentHost = window.location.protocol + "//" + window.location.host,
-    url = "{$iframe_url}&parentDomain=" + currentHost,
-    baseUrl = '{$base_url}',
-    current_id_tab = '{$tab_id}',
-    controller = '{$controller}',
-    shops = JSON.parse('{$shops|@json_encode}');
-var shopId;
+{* Select property and widget section *}
+<div class="panel" id="fieldset_1">
+    <div class="panel-heading"> <i class="icon-cogs"></i> Configure Widget</div>
+    <div class="form-wrapper row">
+        <div class="form-group row">
+            <iframe
+                id="tawkIframe"
+                src=""
+                style="min-height: 275px; width: 100%; border: none; margin: 5px 0; padding: 10px; background: #FFF;">
+            </iframe>
+        </div>
+    </div>
+</div>
 
-{literal}
-jQuery('#tawkIframe').attr('src', url);
-
-var iframe = jQuery('#tawk_widget_customization')[0];
-
-window.addEventListener('message', function(e) {
-    if(e.origin === baseUrl) {
-
-        if(e.data.action === 'setWidget') {
-            setWidget(e);
-        }
-
-        if(e.data.action === 'removeWidget') {
-            removeWidget(e);
-        }
-    }
-});
-
-function setWidget(e) {
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'setWidget',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            pageId     : e.data.pageId,
-            widgetId   : e.data.widgetId,
-            domain     : domain,
-            shopId     : parseInt(shopId)
-        },
-        success : function(r) {
-            if(r.success) {
-                e.source.postMessage({action: 'setDone'} , baseUrl);
-
-                shops[shopId] = {
-                    pageId : e.data.pageId,
-                    widgetId : e.data.widgetId
-                };
-
-                // TODO: fix the visibility warning toggle
-                $('#module_form, .visibility_warning').toggle();
-            } else {
-                e.source.postMessage({action: 'setFail'} , baseUrl);
-            }
-        }
-    });
-}
-
-function removeWidget(e) {
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'removeWidget',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            domain     : domain,
-            shopId     : parseInt(shopId)
-        },
-        success : function(r) {
-            if(r.success) {
-                e.source.postMessage({action: 'removeDone'} , baseUrl);
-
-                $('input[name="page_id"]').val(e.data.pageId);
-                $('input[name="widget_id"]').val(e.data.widgetId);
-                $('#module_form, .visibility_warning').toggle();
-            } else {
-                e.source.postMessage({action: 'removeFail'} , baseUrl);
-            }
-        }
-    });
-}
-{/literal}
-</script>
-
-<div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
+{* <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div> *}
 
 {* TODO: Dynamically display visibility options depending on the selected store *}
 <form id="module_form" action="" method="post">
@@ -269,67 +187,186 @@ function removeWidget(e) {
         </div>
     </div>
 </form>
+
 <script>
+    var currentHost = window.location.protocol + "//" + window.location.host;
+    var url = "{$iframe_url}&parentDomain=" + currentHost;
+    var baseUrl = '{$base_url}';
+    var current_id_tab = '{$tab_id}';
+    var controller = '{$controller}';
+    var shops = JSON.parse('{$shops|@json_encode}');
+    var shopId, domain;
 
-jQuery(document).ready(function() {
-{if !$page_id || !$widget_id}
-    $('#module_form').hide();
-{/if}
-{literal}
+    jQuery(document).ready(function() {
+        {literal}
+            shopId = jQuery('#stores').val();
+            domain = shops[shopId].domain;
+            setup();
 
-shopId = jQuery('#stores').val();
-jQuery('#stores').change(function (e) {
-    shopId = e.target.value;
-    // TODO: get store info from server then change iframe URL
-});
+            jQuery('#stores').change(function (e) {
+                shopId = e.target.value;
+                domain = shops[shopId].domain;
+                getStoreVisibilityOpts();
+                getStoreWidget();
+            });
 
-// process the form
-$('#module_form').submit(function(event) {
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'setVisibility',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            pageId     : $('input[name="page_id"]').val(),
-            widgetId   : $('input[name="widget_id"]').val(),
-            domain     : domain,
-            options    : $(this).serialize(),
-            shopId     : parseInt(shopId)
-        },
-        success : function(r) {
-            if(r.success) {
-                $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
+            // process the form
+            $('#module_form').submit(setVisibility);
+
+            if (jQuery("#always_display").prop("checked")) {
+                jQuery('.show_specific').prop('disabled', true);
             } else {
+                jQuery('.hide_specific').prop('disabled', true);
+            }
+
+            jQuery("#always_display").change(function() {
+                if (this.checked) {
+                    jQuery('.hide_specific').prop('disabled', false);
+                    jQuery('.show_specific').prop('disabled', true);
+                } else {
+                    jQuery('.hide_specific').prop('disabled', true);
+                    jQuery('.show_specific').prop('disabled', false);
+                }
+            });
+        {/literal}
+    });
+
+    {literal}
+    // Event Listeners
+    window.addEventListener('message', function(e) {
+        if (e.origin === baseUrl) {
+
+            if (e.data.action === 'setWidget') {
+                setWidget(e);
+            }
+
+            if (e.data.action === 'removeWidget') {
+                removeWidget(e);
             }
         }
     });
 
-    // stop the form from submitting the normal way and refreshing the page
-    event.preventDefault();
-});
-
-if(jQuery("#always_display").prop("checked")){
-    jQuery('.show_specific').prop('disabled', true);
-} else {
-    jQuery('.hide_specific').prop('disabled', true);
-}
-
-jQuery("#always_display").change(function() {
-    if(this.checked){
-        jQuery('.hide_specific').prop('disabled', false);
-        jQuery('.show_specific').prop('disabled', true);
-    }else{
-        jQuery('.hide_specific').prop('disabled', true);
-        jQuery('.show_specific').prop('disabled', false);
+    // Functions
+    function setup() {
+        getStoreVisibilityOpts();
+        getStoreWidget();
     }
-});
-{/literal}
-});
+
+    function getStoreWidget() {
+        var payload = {
+            controller : 'AdminTawkto',
+            action : 'getStoreWidget',
+            ajax : true,
+            shopId : parseInt(shopId)
+        };
+        $.get(controller, payload)
+            .done(function (data) {
+                var result = JSON.parse(data);
+                var updatedUrl = new URL(url);
+                updatedUrl.searchParams.set('currentWidgetId', result.widgetId || '');
+                updatedUrl.searchParams.set('currentPageId', result.pageId || '');
+
+                url = updatedUrl.href;
+                jQuery('#tawkIframe').attr('src', url);
+            });
+    }
+
+    function getStoreVisibilityOpts() {
+        var payload = {
+            controller : 'AdminTawkto',
+            action : 'getStoreVisibilityOpts',
+            ajax : true,
+            shopId : parseInt(shopId)
+        };
+        $.get(controller, payload)
+            .done(function (data) {
+                var result = JSON.parse(data);
+                // TODO: bind the options to their respective elements
+            });
+    }
+
+    function setWidget(e) {
+        $.ajax({
+            type     : 'POST',
+            url      : controller,
+            dataType : 'json',
+            data     : {
+                controller : 'AdminTawkto',
+                action     : 'setWidget',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                pageId     : e.data.pageId,
+                widgetId   : e.data.widgetId,
+                domain     : domain,
+                shopId     : parseInt(shopId)
+            },
+            success : function(r) {
+                if(r.success) {
+                    e.source.postMessage({action: 'setDone'} , baseUrl);
+
+                    // TODO: fix the visibility warning toggle
+                    $('#module_form, .visibility_warning').toggle();
+                } else {
+                    e.source.postMessage({action: 'setFail'} , baseUrl);
+                }
+            }
+        });
+    }
+
+    function removeWidget(e) {
+        $.ajax({
+            type     : 'POST',
+            url      : controller,
+            dataType : 'json',
+            data     : {
+                controller : 'AdminTawkto',
+                action     : 'removeWidget',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                domain     : domain,
+                shopId     : parseInt(shopId)
+            },
+            success : function(r) {
+                if (r.success) {
+                    e.source.postMessage({action: 'removeDone'} , baseUrl);
+
+                    $('input[name="page_id"]').val(e.data.pageId);
+                    $('input[name="widget_id"]').val(e.data.widgetId);
+                    $('#module_form, .visibility_warning').toggle();
+                } else {
+                    e.source.postMessage({action: 'removeFail'} , baseUrl);
+                }
+            }
+        });
+    }
+
+    function setVisibility(e) {
+        $.ajax({
+            type : 'POST',
+            url : controller,
+            dataType : 'json',
+            data : {
+                controller : 'AdminTawkto',
+                action     : 'setVisibility',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                pageId     : $('input[name="page_id"]').val(),
+                widgetId   : $('input[name="widget_id"]').val(),
+                domain     : domain,
+                options    : $(this).serialize(),
+                shopId     : parseInt(shopId)
+            },
+            success : function(r) {
+                if(r.success) {
+                    $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
+                }
+            }
+        });
+
+        // stop the form from submitting the normal way and refreshing the page
+        event.preventDefault();
+    }
+    {/literal}
 
 </script>
 
