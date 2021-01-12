@@ -293,15 +293,19 @@
                     }
                 }
 
+            })
+            .error(function (xhr, status, err) {
+                errEl.html('Failed to retrieve visibility settings.');
+                errEl.show();
             });
     }
 
     function setWidget(e) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
                 action     : 'setWidget',
                 ajax       : true,
@@ -312,7 +316,7 @@
                 shopId     : parseInt(shopId)
             },
             success : function(r) {
-                if(r.success) {
+                if (r.success) {
                     e.source.postMessage({action: 'setDone'} , baseUrl);
                     toggleVisibilityForm(e.data.pageId, e.data.widgetId);
                     toggleSameUserWarning(true);
@@ -325,10 +329,10 @@
 
     function removeWidget(e) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
                 action     : 'removeWidget',
                 ajax       : true,
@@ -354,14 +358,12 @@
             dataType : 'json',
             data : {
                 controller : 'AdminTawkto',
-                action     : 'setVisibility',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                pageId     : $('input[name="page_id"]').val(),
-                widgetId   : $('input[name="widget_id"]').val(),
-                domain     : domain,
-                options    : $(this).serialize(),
-                shopId     : parseInt(shopId)
+                action : 'setVisibility',
+                ajax : true,
+                id_tab : current_id_tab,
+                domain : domain,
+                options : $(this).serialize(),
+                shopId : parseInt(shopId)
             },
             success : function(r) {
                 if(r.success) {

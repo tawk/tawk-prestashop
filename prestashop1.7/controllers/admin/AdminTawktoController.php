@@ -187,10 +187,6 @@ class AdminTawktoController extends ModuleAdminController
         $key = TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}";
         Configuration::updateValue($key, json_encode($jsonOpts));
 
-        // not needed to log who set visibility
-        // $key = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
-        // Configuration::updateValue($key, $this->context->employee->id);
-
         die(Tools::jsonEncode(array('success' => true)));
     }
 
