@@ -1,5 +1,4 @@
-<!--
-/**
+{*
  * tawk.to
  *
  * NOTICE OF LICENSE
@@ -12,10 +11,11 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2014 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
--->
+ * @author tawkto support@tawk.to
+ * @copyright Copyright (c) 2014-2021 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *}
+
 {include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
 
 {if !$same_user}
@@ -27,89 +27,89 @@
     src=""
     style="min-height: 275px; width: 100%; border: none; margin: 5px 0; padding: 10px; background: #FFF;">
 </iframe>
-<input type="hidden" class="hidden" name="page_id" value="{$page_id}">
-<input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
+<input type="hidden" class="hidden" name="page_id" value="{$page_id|escape:'html':'UTF-8'}">
+<input type="hidden" class="hidden" name="widget_id" value="{$widget_id|escape:'html':'UTF-8'}">
 <script>
-var domain = '{$domain}';
-var currentHost = window.location.protocol + "//" + window.location.host,
-    url = "{$iframe_url}&parentDomain=" + currentHost,
-    baseUrl = '{$base_url}',
-    current_id_tab = '{$tab_id}',
-    controller = '{$controller}';
+    var domain = "{$domain|escape:'url':'UTF-8'}";;
+    var currentHost = window.location.protocol + "//" + window.location.host,
+        url = decodeURIComponent("{$iframe_url|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
+        baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}"),
+        current_id_tab = "{$tab_id|escape:'javascript':'UTF-8'}",
+        controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");
 
-{literal}
-jQuery('#tawkIframe').attr('src', url);
+    {literal}
+    jQuery('#tawkIframe').attr('src', url);
 
-var iframe = jQuery('#tawk_widget_customization')[0];
+    var iframe = jQuery('#tawk_widget_customization')[0];
 
-window.addEventListener('message', function(e) {
-    if(e.origin === baseUrl) {
+    window.addEventListener('message', function(e) {
+        if(e.origin === baseUrl) {
 
-        if(e.data.action === 'setWidget') {
-            setWidget(e);
+            if(e.data.action === 'setWidget') {
+                setWidget(e);
+            }
+
+            if(e.data.action === 'removeWidget') {
+                removeWidget(e);
+            }
         }
+    });
 
-        if(e.data.action === 'removeWidget') {
-            removeWidget(e);
-        }
+    function setWidget(e) {
+
+        $.ajax({
+            type     : 'POST',
+            url      : controller,
+            dataType : 'json',
+            data     : {
+                controller : 'AdminTawkto',
+                action     : 'setWidget',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                pageId     : e.data.pageId,
+                widgetId   : e.data.widgetId,
+                domain     : domain
+            },
+            success : function(r) {
+                if(r.success) {
+                    e.source.postMessage({action: 'setDone'} , baseUrl);
+
+                    $('input[name="page_id"]').val(e.data.pageId);
+                    $('input[name="widget_id"]').val(e.data.widgetId);
+                    $('#module_form, .visibility_warning').toggle();
+                } else {
+                    e.source.postMessage({action: 'setFail'} , baseUrl);
+                }
+            }
+        });
     }
-});
 
-function setWidget(e) {
+    function removeWidget(e) {
+        $.ajax({
+            type     : 'POST',
+            url      : controller,
+            dataType : 'json',
+            data     : {
+                controller : 'AdminTawkto',
+                action     : 'removeWidget',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                domain     : domain
+            },
+            success : function(r) {
+                if(r.success) {
+                    e.source.postMessage({action: 'removeDone'} , baseUrl);
 
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'setWidget',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            pageId     : e.data.pageId,
-            widgetId   : e.data.widgetId,
-            domain     : domain
-        },
-        success : function(r) {
-            if(r.success) {
-                e.source.postMessage({action: 'setDone'} , baseUrl);
-
-                $('input[name="page_id"]').val(e.data.pageId);
-                $('input[name="widget_id"]').val(e.data.widgetId);
-                $('#module_form, .visibility_warning').toggle();
-            } else {
-                e.source.postMessage({action: 'setFail'} , baseUrl);
+                    $('input[name="page_id"]').val(e.data.pageId);
+                    $('input[name="widget_id"]').val(e.data.widgetId);
+                    $('#module_form, .visibility_warning').toggle();
+                } else {
+                    e.source.postMessage({action: 'removeFail'} , baseUrl);
+                }
             }
-        }
-    });
-}
-
-function removeWidget(e) {
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'removeWidget',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            domain     : domain
-        },
-        success : function(r) {
-            if(r.success) {
-                e.source.postMessage({action: 'removeDone'} , baseUrl);
-
-                $('input[name="page_id"]').val(e.data.pageId);
-                $('input[name="widget_id"]').val(e.data.widgetId);
-                $('#module_form, .visibility_warning').toggle();
-            } else {
-                e.source.postMessage({action: 'removeFail'} , baseUrl);
-            }
-        }
-    });
-}
-{/literal}
+        });
+    }
+    {/literal}
 </script>
 
 <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
@@ -130,7 +130,7 @@ function removeWidget(e) {
                         <label>
                             <input type="checkbox" name="always_display"
                                 id="always_display" value="1"
-                                {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
+                                {(is_null($display_opts) || $display_opts->always_display)?'checked':''|escape:'html':'UTF-8'} />
                         </label>
                     </div>
                 </div>
@@ -147,8 +147,7 @@ function removeWidget(e) {
                     <label>
                     {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
                     {$whitelist = json_decode($display_opts->hide_oncustom)}
-                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30"
-                        rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
+                    <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                     {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
                     {/if}
@@ -173,7 +172,7 @@ function removeWidget(e) {
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onfrontpage"
                                 id="show_onfrontpage" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
+                                {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''|escape:'html':'UTF-8'} />
                         </label>
                     </div>
                 </div>
@@ -191,7 +190,7 @@ function removeWidget(e) {
                         <label>
                             <input class="show_specific" type="checkbox" name="show_oncategory"
                                 id="show_oncategory" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
+                                {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''|escape:'html':'UTF-8'} />
                         </label>
                     </div>
                 </div>
@@ -209,7 +208,7 @@ function removeWidget(e) {
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onproduct"
                                 id="show_onproduct" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
+                                {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''|escape:'html':'UTF-8'} />
                         </label>
                     </div>
                 </div>
@@ -227,8 +226,7 @@ function removeWidget(e) {
                         <label>
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
                         {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30"
-                            rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
+                        <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                         {/if}
@@ -251,56 +249,55 @@ function removeWidget(e) {
 <script>
 
 jQuery(document).ready(function() {
-{if !$page_id || !$widget_id}
-    $('#module_form').hide();
-{/if}
-{literal}
-// process the form
-$('#module_form').submit(function(event) {
-    $.ajax({
-        type     : 'POST',
-        url      : controller,
-        dataType : 'json',
-        dataType : 'json',
-        data     : {
-            controller : 'AdminTawkto',
-            action     : 'setVisibility',
-            ajax       : true,
-            id_tab     : current_id_tab,
-            pageId     : $('input[name="page_id"]').val(),
-            widgetId   : $('input[name="widget_id"]').val(),
-            domain     : domain,
-            options    : $(this).serialize()
-        },
-        success : function(r) {
-            if(r.success) {
-                $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
-            } else {
+    {if !$page_id || !$widget_id}
+        $('#module_form').hide();
+    {/if}
+    {literal}
+    // process the form
+    $('#module_form').submit(function(event) {
+        $.ajax({
+            type     : 'POST',
+            url      : controller,
+            dataType : 'json',
+            dataType : 'json',
+            data     : {
+                controller : 'AdminTawkto',
+                action     : 'setVisibility',
+                ajax       : true,
+                id_tab     : current_id_tab,
+                pageId     : $('input[name="page_id"]').val(),
+                widgetId   : $('input[name="widget_id"]').val(),
+                domain     : domain,
+                options    : $(this).serialize()
+            },
+            success : function(r) {
+                if(r.success) {
+                    $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
+                } else {
+                }
             }
-        }
+        });
+
+        // stop the form from submitting the normal way and refreshing the page
+        event.preventDefault();
     });
 
-    // stop the form from submitting the normal way and refreshing the page
-    event.preventDefault();
-});
-
-if(jQuery("#always_display").prop("checked")){
-    jQuery('.show_specific').prop('disabled', true);
-} else {
-    jQuery('.hide_specific').prop('disabled', true);
-}
-
-jQuery("#always_display").change(function() {
-    if(this.checked){
-        jQuery('.hide_specific').prop('disabled', false);
+    if (jQuery("#always_display").prop("checked")) {
         jQuery('.show_specific').prop('disabled', true);
-    }else{
+    } else {
         jQuery('.hide_specific').prop('disabled', true);
-        jQuery('.show_specific').prop('disabled', false);
     }
-});
-{/literal}
-});
 
+    jQuery("#always_display").change(function() {
+        if (this.checked) {
+            jQuery('.hide_specific').prop('disabled', false);
+            jQuery('.show_specific').prop('disabled', true);
+        } else {
+            jQuery('.hide_specific').prop('disabled', true);
+            jQuery('.show_specific').prop('disabled', false);
+        }
+    });
+    {/literal}
+});
 </script>
 
