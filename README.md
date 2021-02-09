@@ -4,37 +4,56 @@ Free live chat widget for your site
 
 ## Description
 
-tawk.to is a  free  live chat app that lets you monitor and  chat  with  visitors on your website  or from a free customizable page. No catch. No spam. No wares. It's truly free and always will be.
+The tawk.to Live Chat app makes it easy to monitor and chat with visitors on your website. Be there when they need you with unlimited messaging, ticketing and your own Knowledge Base — all 100% FREE.
 
-No account ? Create one here : https://www.tawk.to/?utm_source=prestashop&utm_medium=link&utm_campaign=signup
+Compatible with all modern browsers, tawk.to was created in response to the growing need for businesses to respond in real time, with real people.
+
+Never lose another lead or sale again — tawk.to offers iOS, Android, Windows and Mac OSX apps to keep you connected wherever you go.
+
+Don’t have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_source=prestashop&utm_medium=link&utm_campaign=signup)
 
 ## Installation
 
-== Prestashop 1.5 - 1.6 Installation ==
-This section describes how to install the plugin and get it working on Prestashop versions 1.5 - 1.6
+### Prestashop 1.6
+This section describes how to install the plugin and get it working on Prestashop 1.6
 
-1. Download and extract the tawkto.zip
-2. Upload `tawkto` directory to the `/modules/` directory
-3. Install module from `Modules -> Front Office Features`
-4. Go to `Administration`, then to `Tawk.to` to select page and widget you wish to use
+#### Module Installer
+1. Download the `tawk-prestashop-1.6-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+2. Go to `Dashboard` -> `Modules and Services`.
+3. Click `Add a new module`, upload the zip file, and click `Upload this module`.
+4. Search for the `tawk.to` plugin and `install`.
 
-== Prestashop 1.7 Installation ==
-This section describes how to install the plugin and get it working on Prestashop version 1.7
+#### Manual Installation
+1. Download and extract the `tawk-prestashop-1.6-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+2. Upload `tawkto` directory to the `/modules/` directory.
+3. Go to `Dashboard` -> `Modules and Services`.
+4. Search for the `tawk.to` plugin and `install`.
 
-1. Download and extract the tawkto1.7.zip
-2. Go to Dashboard -> Modules -> Modules and Services.
-3. Click on the Upload a Module button
-4. Drag and drop the tawkto1.7.zip, or upload the tawkto1.7.zip using the Upload a Module popup
-5. Click on `Configure` to start setting your tawk.to module
+#### Where is the configuration page located?
+It is under `Dashboard` -> `Administration` -> `tawk.to`.
 
-Note: You will need a free tawk.to account to generate the embed code, create one here : https://www.tawk.to/?utm_source=prestashop&utm_medium=link&utm_campaign=signup
+### Prestashop 1.7
+This section describes how to install the plugin and get it working on Prestashop 1.7
+
+#### Module Installer
+1. Download the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
+3. Click `Upload a module`, upload the zip file, and it'll automatically install the module.
+
+#### Manual Installation
+1. Download and extract the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+2. Upload `tawkto` directory to the `/modules/` directory.
+3. Go to `Dashboard` -> `Modules` -> `Module Catalog`.
+4. Search for the `tawk.to` plugin and `install`.
+
+#### Where is the configuration page located?
+It is under `Dashboard` -> `More` -> `tawk.to`.
+
+### Widget Configuration
+1. Go to the configuration page.
+2. Log in to your tawk.to account.
+3. Select the property and the widget you want to place on your store and click `Use selected widget`.
+4. The widget will now appear on your store.
 
 ## Frequently Asked Questions
-
-[FAQ](http://tawk.uservoice.com/knowledgebase)
-
-## Screenshots
-
-1. Chat window - minimized
-2. Plugin settings page
-3. Chat widget - maximized
+Visit our [Help Center](https://help.tawk.to/) for answers to FAQs
