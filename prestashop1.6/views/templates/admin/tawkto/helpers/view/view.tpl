@@ -1,5 +1,4 @@
-<!--
-/**
+{*
  * tawk.to
  *
  * NOTICE OF LICENSE
@@ -12,10 +11,10 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2021 tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
--->
+ * @author tawkto support@tawk.to
+ * @copyright Copyright (c) 2014-2021 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *}
 {include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
 
 {* Select store section *}
@@ -25,7 +24,7 @@
         <div class="form-group row">
             <select id="stores" class="form-control">
             {foreach $shops as $shop}
-                <option value={$shop['id']}>{$shop['name']}</option>
+                <option value={$shop['id']|escape:'html':'UTF-8'}>{$shop['name']|escape:'html':'UTF-8'}</option>
             {/foreach}
             </select>
         </div>
@@ -160,7 +159,7 @@
 
         </div><!-- end form-wrapper -->
         <div class="panel-footer">
-            <div id="optionsSuccessMessage" class="alert alert-success" style="display: none">Successfully set widget options to your site</div>
+            <div id="optionsSuccessMessage" class="alert alert-success pull-left" style="display: none">Successfully set widget options to your site</div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
@@ -168,12 +167,13 @@
 </div>
 
 <script type="text/javascript">
+ var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host;
-    var url = "{$iframe_url}&parentDomain=" + currentHost;
-    var baseUrl = '{$base_url}';
-    var current_id_tab = '{$tab_id}';
-    var controller = '{$controller}';
-    var shops = JSON.parse('{$shops|@json_encode}');
+    var url = decodeURIComponent("{$iframe_url|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost;
+    var baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}");
+    var currentIdTab = "{$tab_id|escape:'javascript':'UTF-8'}";
+    var controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");
+    var shops = JSON.parse("{$shops|@json_encode|escape:'javascript':'UTF-8'}");
     var shopId, domain;
 
     jQuery(document).ready(function() {
@@ -232,7 +232,9 @@
             controller : 'AdminTawkto',
             action : 'getStoreWidget',
             ajax : true,
-            shopId : parseInt(shopId)
+            shopId : parseInt(shopId),
+            id_tab : currentIdTab,
+            domain
         };
         $.get(controller, payload)
             .success(function (data) {
@@ -261,7 +263,9 @@
             controller : 'AdminTawkto',
             action : 'getStoreVisibilityOpts',
             ajax : true,
-            shopId : parseInt(shopId)
+            shopId : parseInt(shopId),
+            id_tab : currentIdTab,
+            domain
         };
         $.get(controller, payload)
             .success(function (data) {
@@ -308,7 +312,7 @@
                 controller : 'AdminTawkto',
                 action     : 'setWidget',
                 ajax       : true,
-                id_tab     : current_id_tab,
+                id_tab     : currentIdTab,
                 pageId     : e.data.pageId,
                 widgetId   : e.data.widgetId,
                 domain     : domain,
@@ -335,7 +339,7 @@
                 controller : 'AdminTawkto',
                 action     : 'removeWidget',
                 ajax       : true,
-                id_tab     : current_id_tab,
+                id_tab     : currentIdTab,
                 domain     : domain,
                 shopId     : parseInt(shopId)
             },
@@ -359,7 +363,7 @@
                 controller : 'AdminTawkto',
                 action : 'setVisibility',
                 ajax : true,
-                id_tab : current_id_tab,
+                id_tab : currentIdTab,
                 domain : domain,
                 options : $(this).serialize(),
                 shopId : parseInt(shopId)
