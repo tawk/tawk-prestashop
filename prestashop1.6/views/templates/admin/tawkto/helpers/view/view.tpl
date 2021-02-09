@@ -402,7 +402,6 @@
         var alwaysDisplayEl = $('#always_display');
         alwaysDisplayEl.prop('checked', true);
         alwaysDisplayEl.trigger('change');
-
     }
     {/literal}
 
