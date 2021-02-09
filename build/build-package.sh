@@ -1,8 +1,8 @@
 #!/bin/sh
 
 build_dir=$(dirname $0);
-ps_16_release_version=1.1.0;
-ps_17_release_version=1.1.0;
+ps_16_release_version=1.2.0;
+ps_17_release_version=1.2.0;
 
 build_release_file() {
     if [ -z "$1" ]
