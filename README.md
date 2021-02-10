@@ -38,7 +38,7 @@ This section describes how to install the plugin and get it working on Prestasho
 #### Module Installer
 1. Download the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
-3. Click `Upload a module`, upload the zip file, and it'll automatically install the module.
+3. Click `Upload a module`, upload the zip file, and the module will install automatically.
 
 #### Manual Installation
 1. Download and extract the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
