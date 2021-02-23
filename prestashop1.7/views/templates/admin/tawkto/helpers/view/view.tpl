@@ -58,17 +58,17 @@
     function setWidget(e) {
 
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'setWidget',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                pageId     : e.data.pageId,
-                widgetId   : e.data.widgetId,
-                domain     : domain
+                action : 'setWidget',
+                ajax : true,
+                id_tab : current_id_tab,
+                pageId : e.data.pageId,
+                widgetId : e.data.widgetId,
+                domain : domain
             },
             success : function(r) {
                 if(r.success) {
@@ -86,15 +86,15 @@
 
     function removeWidget(e) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'removeWidget',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                domain     : domain
+                action : 'removeWidget',
+                ajax : true,
+                id_tab : current_id_tab,
+                domain : domain
             },
             success : function(r) {
                 if(r.success) {
@@ -268,19 +268,18 @@ jQuery(document).ready(function() {
     // process the form
     $('#module_form').submit(function(event) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'setVisibility',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                pageId     : $('input[name="page_id"]').val(),
-                widgetId   : $('input[name="widget_id"]').val(),
-                domain     : domain,
-                options    : $(this).serialize()
+                action : 'setVisibility',
+                ajax : true,
+                id_tab : current_id_tab,
+                pageId : $('input[name="page_id"]').val(),
+                widgetId : $('input[name="widget_id"]').val(),
+                domain : domain,
+                options : $(this).serialize()
             },
             success : function(r) {
                 if(r.success) {

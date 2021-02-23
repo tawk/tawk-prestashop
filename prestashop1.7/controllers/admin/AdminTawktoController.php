@@ -63,9 +63,9 @@ class AdminTawktoController extends ModuleAdminController
         $shopId = 1;
         $domain = $_SERVER['SERVER_NAME'];
         foreach ($shops as $shop) {
-            if ($domain && $shop['domain']==$domain) {
+            if ($domain && $shop['domain'] == $domain) {
                 $domain = trim($shop['domain']);
-                $shopId = (int)$shop['id_shop'];
+                $shopId = (int) $shop['id_shop'];
             }
         }
         reset($shops);
@@ -93,7 +93,7 @@ class AdminTawktoController extends ModuleAdminController
             'iframe_url' => $this->getIframeUrl(),
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
-            'tab_id' => (int)$this->context->controller->id,
+            'tab_id' => (int) $this->context->controller->id,
             'shops' => $shops,
             'domain' => $domain,
             'display_opts' => $displayOpts,
@@ -120,8 +120,8 @@ class AdminTawktoController extends ModuleAdminController
         $shops = Shop::getShops();
         if (count($shops) > 1) {
             foreach ($shops as $shop) {
-                if ($shop['domain']==$domain) {
-                    $shopId = (int)$shop['id_shop'];
+                if ($shop['domain'] == $domain) {
+                    $shopId = (int) $shop['id_shop'];
                 }
             }
         }
@@ -145,7 +145,9 @@ class AdminTawktoController extends ModuleAdminController
             die(Tools::jsonEncode(array('success' => false)));
         }
 
-        if (!self::idsAreCorrect(Tools::getValue('pageId'), Tools::getValue('widgetId'))) {
+        $pageId = Tools::getValue('pageId');
+        $widgetId = Tools::getValue('widgetId');
+        if (!self::idsAreCorrect($pageId, $widgetId)) {
             die(Tools::jsonEncode(array('success' => false)));
         }
 
@@ -154,17 +156,17 @@ class AdminTawktoController extends ModuleAdminController
         $domain = addslashes(trim($_REQUEST['domain']));
         if (count($shops) && !empty($domain)) {
             foreach ($shops as $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = (int)$shop['id_shop'];
+                if ($domain && $shop['domain'] == $domain) {
+                    $shopId = (int) $shop['id_shop'];
                 }
             }
         }
 
         $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID."_{$shopId}";
-        Configuration::updateValue($pageKey, Tools::getValue('pageId'));
+        Configuration::updateValue($pageKey, $pageId);
 
         $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}";
-        Configuration::updateValue($widgetKey, Tools::getValue('widgetId'));
+        Configuration::updateValue($widgetKey, $widgetId);
 
         $userKey = TawkTo::TAWKTO_WIDGET_USER."_{$shopId}";
         Configuration::updateValue($userKey, $this->context->employee->id);
@@ -179,8 +181,8 @@ class AdminTawktoController extends ModuleAdminController
         $domain = addslashes(trim($_REQUEST['domain']));
         if (count($shops) && !empty($domain)) {
             foreach ($shops as $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = (int)$shop['id_shop'];
+                if ($domain && $shop['domain'] == $domain) {
+                    $shopId = (int) $shop['id_shop'];
                 }
             }
         }
@@ -204,9 +206,9 @@ class AdminTawktoController extends ModuleAdminController
         $shops = Shop::getShops();
         $domain = addslashes(trim(Tools::getValue('domain')));
         if (count($shops) && !empty($domain)) {
-            foreach ($shops as $key => $shop) {
-                if ($domain && $shop['domain']==$domain) {
-                    $shopId = (int)$shop['id_shop'];
+            foreach ($shops as $shop) {
+                if ($domain && $shop['domain'] == $domain) {
+                    $shopId = (int) $shop['id_shop'];
                 }
             }
         }
@@ -220,8 +222,9 @@ class AdminTawktoController extends ModuleAdminController
             'show_oncustom' => array(),
         );
 
-        if (!empty(Tools::getValue('options'))) {
-            $options = explode('&', Tools::getValue('options'));
+        $options = Tools::getValue('options');
+        if (!empty($options)) {
+            $options = explode('&', $options);
             foreach ($options as $post) {
                 list($column, $value) = explode('=', $post);
                 switch ($column) {
@@ -230,7 +233,7 @@ class AdminTawktoController extends ModuleAdminController
                         // replace newlines and returns with comma, and convert to array for saving
                         $value = urldecode($value);
                         $value = str_ireplace(array("\r\n", "\r", "\n"), ',', $value);
-                        if ($value !== '') {
+                        if (!empty($value)) {
                             $value = explode(",", $value);
                             $jsonOpts[$column] = json_encode($value);
                         }
@@ -239,7 +242,7 @@ class AdminTawktoController extends ModuleAdminController
                     case 'show_oncategory':
                     case 'show_onproduct':
                     case 'always_display':
-                        $jsonOpts[$column] = ($value==1)?true:false;
+                        $jsonOpts[$column] = ($value == 1);
                         break;
                 }
             }
