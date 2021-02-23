@@ -123,7 +123,10 @@
                         <label>
                             <input type="checkbox" name="always_display"
                                 id="always_display" value="1"
-                                {(is_null($display_opts) || $display_opts->always_display)?'checked':''|escape:'html':'UTF-8'} />
+                                {if is_null($display_opts) || $display_opts->always_display}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -141,7 +144,10 @@
                         <label>
                             <input type="checkbox" name="show_onfrontpage"
                                 id="show_onfrontpage" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''|escape:'html':'UTF-8'} />
+                                {if !is_null($display_opts) && $display_opts->show_onfrontpage}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -159,7 +165,10 @@
                         <label>
                             <input type="checkbox" name="show_oncategory"
                                 id="show_oncategory" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''|escape:'html':'UTF-8'} />
+                                {if !is_null($display_opts) && $display_opts->show_oncategory}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -177,7 +186,10 @@
                         <label>
                             <input type="checkbox" name="show_onproduct"
                                 id="show_onproduct" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''|escape:'html':'UTF-8'} />
+                                {if !is_null($display_opts) && $display_opts->show_onproduct}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
