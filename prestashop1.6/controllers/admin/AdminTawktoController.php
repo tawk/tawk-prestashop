@@ -218,6 +218,7 @@ class AdminTawktoController extends ModuleAdminController
             'show_oncategory' => false,
             'show_onproduct' => false,
             'show_oncustom' => array(),
+            'enable_visitor_recognition' => false
         );
 
         $options = Tools::getValue('options');
@@ -239,6 +240,7 @@ class AdminTawktoController extends ModuleAdminController
                     case 'show_oncategory':
                     case 'show_onproduct':
                     case 'always_display':
+                    case 'enable_visitor_recognition':
                         $jsonOpts[$column] = ($value == 1);
                         break;
                 }
