@@ -22,6 +22,13 @@
 <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
 {/if}
 
+<style>
+#module_form .radio {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+</style>
+
 <iframe
     id="tawkIframe"
     src=""
@@ -115,148 +122,176 @@
 <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
 
 <form id="module_form" action="" method="post">
-    <div class="panel" id="fieldset_1">
-        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
-        <div class="form-wrapper row">
-            <div class="form-group row">
-                <label class="control-label col-lg-3" for="always_display">
-                    <span data-toggle="tooltip" data-html="true"
-                        title="" data-original-title="Select which pages that chat is displayed in the site(s)">
-                        Always show tawk.to widget on every page
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="radio ">
-                        <label>
-                            <input type="checkbox" name="always_display"
-                                id="always_display" value="1"
-                                {if is_null($display_opts) || $display_opts->always_display}
-                                    checked
+    <div class="panel" id="fieldset_1" style="padding: 0;">
+        <div class="panel-body" style="padding: 0;">
+            <div class="panel col-lg-6" id="visibility_options">
+                <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
+                <div class="form-wrapper row">
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3" for="always_display">
+                            <span data-toggle="tooltip" data-html="true"
+                                title="" data-original-title="Select which pages that chat is displayed in the site(s)">
+                                Always show tawk.to widget on every page
+                            </span>
+                        </label>
+                        <div class="col-lg-9">
+                            <div class="radio ">
+                                <label>
+                                    <input type="checkbox" name="always_display"
+                                        id="always_display" value="1"
+                                        {if is_null($display_opts) || $display_opts->always_display}
+                                            checked
+                                        {/if}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-12">
+                        <label class="control-label col-lg-3" for="hide_oncustom">
+                            <span data-toggle="tooltip" data-html="true"
+                                title=""  data-original-title="Select which pages that chat is not displayed">
+                                Except on pages:
+                            </span>
+                        </label>
+                        <div class="col-lg-6 control-label">
+                            <label>
+                            {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
+                                {$whitelist = json_decode($display_opts->hide_oncustom)}
+                                <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
+                            {else}
+                                <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
+                            {/if}
+                            </label>
+                            <br>
+                            <p style="text-align: justify;">
+                            Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
+                            Put each URL in a new line.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3">
+                            <span data-toggle="tooltip" data-html="true"
+                                title="" >
+                                Show on frontpage
+                            </span>
+                        </label>
+                        <div class="col-lg-9">
+                            <div class="radio ">
+                                <label>
+                                    <input class="show_specific" type="checkbox" name="show_onfrontpage"
+                                        id="show_onfrontpage" value="1"
+                                        {if !is_null($display_opts) && $display_opts->show_onfrontpage}
+                                            checked
+                                        {/if}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3">
+                            <span data-toggle="tooltip" data-html="true"
+                                title="" >
+                                Show on category pages
+                            </span>
+                        </label>
+                        <div class="col-lg-9">
+                            <div class="radio ">
+                                <label>
+                                    <input class="show_specific" type="checkbox" name="show_oncategory"
+                                        id="show_oncategory" value="1"
+                                        {if !is_null($display_opts) && $display_opts->show_oncategory}
+                                            checked
+                                        {/if}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3">
+                            <span data-toggle="tooltip" data-html="true"
+                                title="" >
+                                Show on product pages
+                            </span>
+                        </label>
+                        <div class="col-lg-9">
+                            <div class="radio ">
+                                <label>
+                                    <input class="show_specific" type="checkbox" name="show_onproduct"
+                                        id="show_onproduct" value="1"
+                                        {if !is_null($display_opts) && $display_opts->show_onproduct}
+                                            checked
+                                        {/if}
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3">
+                            <span data-toggle="tooltip" data-html="true"
+                                title="" >
+                                Show on pages:
+                            </span>
+                        </label>
+                        <div class="col-lg-9">
+                            <div class="text">
+                                <label>
+                                {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
+                                    {$whitelist = json_decode($display_opts->show_oncustom)}
+                                    <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
+                                {else}
+                                    <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                                 {/if}
-                            />
-                        </label>
+                                </label>
+                                <br>
+                                Add URLs to pages in which you would like to show the widget.<br>
+                                Put each URL in a new line.<br>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="form-group col-lg-12">
-                <label class="control-label col-lg-3" for="hide_oncustom">
-                    <span data-toggle="tooltip" data-html="true"
-                        title=""  data-original-title="Select which pages that chat is not displayed">
-                        Except on pages:
-                    </span>
-                </label>
-                <div class="col-lg-6 control-label">
-                    <label>
-                    {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
-                        {$whitelist = json_decode($display_opts->hide_oncustom)}
-                        <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
-                    {else}
-                        <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
-                    {/if}
-                    </label>
-                    <br>
-                    <p style="text-align: justify;">
-                    Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
-                    Put each URL in a new line.
-                    </p>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true"
-                        title="" >
-                        Show on frontpage
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="radio ">
-                        <label>
-                            <input class="show_specific" type="checkbox" name="show_onfrontpage"
-                                id="show_onfrontpage" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onfrontpage}
-                                    checked
-                                {/if}
-                            />
+            <div class="panel col-lg-6" style="margin: 0;" id="privacy_options">
+                <div class="panel-heading"> <i class="icon-eye-close"></i> Privacy Options </div>
+                <div class="form-wrapper row">
+                    <div class="form-group row">
+                        <label class="control-label col-lg-3">
+                            <span data-toggle="tooltip" data-html="true"
+                                title=""  data-original-title="Enable Visitor Recognition">
+                                Enable Visitor Recognition
+                            </span>
                         </label>
+                        <div class="col-lg-9">
+                            <div class="radio ">
+                                <label>
+                                    <input type="checkbox" name="enable_visitor_recognition"
+                                        id="enable_visitor_recognition" value="1"
+                                        {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
+                                            checked
+                                        {/if}
+                                    />
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <div class="form-group row">
-                <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true"
-                        title="" >
-                        Show on category pages
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="radio ">
-                        <label>
-                            <input class="show_specific" type="checkbox" name="show_oncategory"
-                                id="show_oncategory" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_oncategory}
-                                    checked
-                                {/if}
-                            />
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true"
-                        title="" >
-                        Show on product pages
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="radio ">
-                        <label>
-                            <input class="show_specific" type="checkbox" name="show_onproduct"
-                                id="show_onproduct" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onproduct}
-                                    checked
-                                {/if}
-                            />
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group row">
-                <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true"
-                        title="" >
-                        Show on pages:
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="text">
-                        <label>
-                        {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
-                            {$whitelist = json_decode($display_opts->show_oncustom)}
-                            <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
-                        {else}
-                            <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
-                        {/if}
-                        </label>
-                        <br>
-                        Add URLs to pages in which you would like to show the widget.<br>
-                        Put each URL in a new line.<br>
-                    </div>
-                </div>
-            </div>
-
-        </div><!-- end form-wrapper -->
-        <div class="panel-footer">
+        </div>
+        <div class="panel-footer" style="margin: 0;">
             <div id="optionsSuccessMessage" style="width: 50%; float: left; background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success">Successfully set widget options to your site</div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
-    </div>
+    </div><!-- end form-wrapper -->
 </form>
 <script>
 
