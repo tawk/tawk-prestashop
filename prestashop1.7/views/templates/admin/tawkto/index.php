@@ -1,1 +1,1 @@
-/home/alvin-home/tawk_github_forks/tawk-prestashop/prestashop1.7/index.php
+../../../../index.php
