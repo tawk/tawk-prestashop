@@ -13,40 +13,20 @@ Never lose another lead or sale again — tawk.to offers iOS, Android, Windows a
 Don’t have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_source=prestashop&utm_medium=link&utm_campaign=signup)
 
 ## Installation
+This section describes how to install the plugin and get it working.
 
-### Prestashop 1.6
-This section describes how to install the plugin and get it working on Prestashop 1.6
-
-#### Module Installer
-1. Download the `tawk-prestashop-1.6-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
-2. Go to `Dashboard` -> `Modules and Services`.
-3. Click `Add a new module`, upload the zip file, and click `Upload this module`.
-4. Search for the `tawk.to` plugin and `install`.
-
-#### Manual Installation
-1. Download and extract the `tawk-prestashop-1.6-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
-2. Upload `tawkto` directory to the `/modules/` directory.
-3. Go to `Dashboard` -> `Modules and Services`.
-4. Search for the `tawk.to` plugin and `install`.
-
-#### Where is the configuration page located?
-It is under `Dashboard` -> `Administration` -> `tawk.to`.
-
-### Prestashop 1.7
-This section describes how to install the plugin and get it working on Prestashop 1.7
-
-#### Module Installer
+### Module Installer
 1. Download the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
 3. Click `Upload a module`, upload the zip file, and the module will install automatically.
 
-#### Manual Installation
+### Manual Installation
 1. Download and extract the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Upload `tawkto` directory to the `/modules/` directory.
 3. Go to `Dashboard` -> `Modules` -> `Module Catalog`.
 4. Search for the `tawk.to` plugin and `install`.
 
-#### Where is the configuration page located?
+### Where is the configuration page located?
 It is under `Dashboard` -> `More` -> `tawk.to`.
 
 ### Widget Configuration

@@ -1,6 +1,5 @@
-<!--
-/**
- * Tawk.to
+{*
+ * tawk.to
  *
  * NOTICE OF LICENSE
  *
@@ -12,10 +11,11 @@
  * obtain it through the world-wide-web, please send an email
  * to support@tawk.to so we can send you a copy immediately.
  *
- * @copyright   Copyright (c) 2014 Tawk.to
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
--->
+ * @author tawkto support@tawk.to
+ * @copyright Copyright (c) 2014-2021 tawk.to
+ * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *}
+
 {include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
 
 {if !$same_user}
@@ -27,15 +27,15 @@
     src=""
     style="min-height: 275px; width: 100%; border: none; margin: 5px 0; padding: 10px; background: #FFF;">
 </iframe>
-<input type="hidden" class="hidden" name="page_id" value="{$page_id}">
-<input type="hidden" class="hidden" name="widget_id" value="{$widget_id}">
+<input type="hidden" class="hidden" name="page_id" value="{$page_id|escape:'html':'UTF-8'}">
+<input type="hidden" class="hidden" name="widget_id" value="{$widget_id|escape:'html':'UTF-8'}">
 <script type="text/javascript">
-    var domain = '{$domain}';
+    var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host,
-        url = "{$iframe_url}&parentDomain=" + currentHost,
-        baseUrl = '{$base_url}',
-        current_id_tab = '{$tab_id}',
-        controller = '{$controller}';
+        url = decodeURIComponent("{$iframe_url|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
+        baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}"),
+        current_id_tab = "{$tab_id|escape:'javascript':'UTF-8'}",
+        controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");
 
     {literal}
     jQuery('#tawkIframe').attr('src', url);
@@ -44,7 +44,6 @@
 
     window.addEventListener('message', function(e) {
         if(e.origin === baseUrl) {
-
             if(e.data.action === 'setWidget') {
                 setWidget(e);
             }
@@ -56,19 +55,18 @@
     });
 
     function setWidget(e) {
-
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'setWidget',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                pageId     : e.data.pageId,
-                widgetId   : e.data.widgetId,
-                domain     : domain
+                action : 'setWidget',
+                ajax : true,
+                id_tab : current_id_tab,
+                pageId : e.data.pageId,
+                widgetId : e.data.widgetId,
+                domain : domain
             },
             success : function(r) {
                 $('input[name="page_id"]').val(e.data.pageId);
@@ -84,15 +82,15 @@
 
     function removeWidget(e) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'removeWidget',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                domain     : domain
+                action : 'removeWidget',
+                ajax : true,
+                id_tab : current_id_tab,
+                domain : domain
             },
             success : function(r) {
                 if(r.success) {
@@ -106,18 +104,6 @@
             }
         });
     }
-
-    function setExceptions(e)
-    {
-        console.log(e);
-        return false;
-    }
-
-    /*function reloadModule(e)
-    {
-        var select = $(e);
-        window.location.search=select.find("option:selected").data('url');
-    }*/
     {/literal}
 </script>
 
@@ -137,7 +123,10 @@
                         <label>
                             <input type="checkbox" name="always_display"
                                 id="always_display" value="1"
-                                {(is_null($display_opts)||$display_opts->always_display)?'checked':''} />
+                                {if is_null($display_opts) || $display_opts->always_display}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -155,7 +144,10 @@
                         <label>
                             <input type="checkbox" name="show_onfrontpage"
                                 id="show_onfrontpage" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onfrontpage)?'checked':''} />
+                                {if !is_null($display_opts) && $display_opts->show_onfrontpage}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -173,7 +165,10 @@
                         <label>
                             <input type="checkbox" name="show_oncategory"
                                 id="show_oncategory" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_oncategory)?'checked':''} />
+                                {if !is_null($display_opts) && $display_opts->show_oncategory}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -191,7 +186,10 @@
                         <label>
                             <input type="checkbox" name="show_onproduct"
                                 id="show_onproduct" value="1"
-                                {(!is_null($display_opts) && $display_opts->show_onproduct)?'checked':''} />
+                                {if !is_null($display_opts) && $display_opts->show_onproduct}
+                                    checked
+                                {/if}
+                            />
                         </label>
                     </div>
                 </div>
@@ -208,9 +206,8 @@
                     <div class="text">
                         <label>
                         {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
-                        {$whitelist = json_decode($display_opts->show_oncustom)}
-                        <textarea name="show_oncustom" id="show_oncustom" cols="30"
-                            rows="10">{foreach from=$whitelist item=page}{$page}{"\r\n"}{/foreach}</textarea>
+                            {$whitelist = json_decode($display_opts->show_oncustom)}
+                            <textarea name="show_oncustom" id="show_oncustom" cols="30"rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
                         {/if}
@@ -236,24 +233,22 @@ jQuery(document).ready(function() {
     // process the form
     $('#module_form').submit(function(event) {
         $.ajax({
-            type     : 'POST',
-            url      : controller,
+            type : 'POST',
+            url : controller,
             dataType : 'json',
-            dataType : 'json',
-            data     : {
+            data : {
                 controller : 'AdminTawkto',
-                action     : 'setVisibility',
-                ajax       : true,
-                id_tab     : current_id_tab,
-                pageId     : $('input[name="page_id"]').val(),
-                widgetId   : $('input[name="widget_id"]').val(),
-                domain     : domain,
-                options    : $(this).serialize()
+                action : 'setVisibility',
+                ajax : true,
+                id_tab : current_id_tab,
+                pageId : $('input[name="page_id"]').val(),
+                widgetId : $('input[name="widget_id"]').val(),
+                domain : domain,
+                options : $(this).serialize()
             },
             success : function(r) {
                 if(r.success) {
                     $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
-                } else {
                 }
             }
         });
@@ -262,7 +257,7 @@ jQuery(document).ready(function() {
         event.preventDefault();
     });
 
-    if(jQuery("#always_display").prop("checked")){
+    if (jQuery("#always_display").prop("checked")) {
         jQuery('#show_onfrontpage').prop('disabled', true);
         jQuery('#show_oncategory').prop('disabled', true);
         jQuery('#show_onproduct').prop('disabled', true);
@@ -270,12 +265,12 @@ jQuery(document).ready(function() {
     }
 
     jQuery("#always_display").change(function() {
-        if(this.checked){
+        if (this.checked) {
             jQuery('#show_onfrontpage').prop('disabled', true);
             jQuery('#show_oncategory').prop('disabled', true);
             jQuery('#show_onproduct').prop('disabled', true);
             jQuery('#show_oncustom').prop('disabled', true);
-        }else{
+        } else {
             jQuery('#show_onfrontpage').prop('disabled', false);
             jQuery('#show_oncategory').prop('disabled', false);
             jQuery('#show_onproduct').prop('disabled', false);
