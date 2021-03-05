@@ -65,7 +65,7 @@ class Tawkto extends Module
             $tab->name[$lang['id_lang']] = 'tawk.to';
         }
 
-        $tab->id_parent = (int)Tab::getIdFromClassName('AdminAdmin');
+        $tab->id_parent = (int) Tab::getIdFromClassName('AdminAdmin');
         $tab->module = $this->name;
 
         return $tab->add();
@@ -169,8 +169,8 @@ class Tawkto extends Module
         $this->context->smarty->assign(array(
             'widget_id' => $widgetId,
             'page_id' => $pageId,
-            'customer_name' => (!is_null($customer_name))?$customer_name:'',
-            'customer_email' => (!is_null($customer_email))?$customer_email:'',
+            'customer_name' => (!is_null($customer_name)) ? $customer_name : '',
+            'customer_email' => (!is_null($customer_email)) ? $customer_email : '',
         ));
 
         return $this->display(__FILE__, 'widget.tpl');
@@ -182,7 +182,7 @@ class Tawkto extends Module
         $shops = Shop::getShops();
         if ($shops && !empty($shops)) {
             foreach ($shops as $shop) {
-                $shopIds[] = (int)$shop['id_shop'];
+                $shopIds[] = (int) $shop['id_shop'];
             }
             reset($shops);
         }

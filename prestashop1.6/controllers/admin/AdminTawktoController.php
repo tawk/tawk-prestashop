@@ -107,7 +107,9 @@ class AdminTawktoController extends ModuleAdminController
             die(Tools::jsonEncode(array('success' => false)));
         }
 
-        if (!self::idsAreCorrect(Tools::getValue('pageId'), Tools::getValue('widgetId'))) {
+        $pageId = Tools::getValue('pageId');
+        $widgetId = Tools::getValue('widgetId');
+        if (!self::idsAreCorrect($pageId, $widgetId)) {
             die(Tools::jsonEncode(array('success' => false)));
         }
 
@@ -154,8 +156,9 @@ class AdminTawktoController extends ModuleAdminController
             'show_oncustom' => array(),
         );
 
-        if (Tools::getIsset('options')) {
-            $options = explode('&', Tools::getValue('options'));
+        $options = Tools::getValue('options');
+        if (!empty($options)) {
+            $options = explode('&', $options);
             foreach ($options as $post) {
                 list($column, $value) = explode('=', $post);
                 switch ($column) {
@@ -164,16 +167,16 @@ class AdminTawktoController extends ModuleAdminController
                         // replace newlines and returns with comma, and convert to array for saving
                         $value = urldecode($value);
                         $value = str_ireplace(array("\r\n", "\r", "\n"), ',', $value);
-                        $value = explode(",", $value);
-                        $value = (empty($value) || !$value) ? array() : $value;
-                        $jsonOpts[$column] = json_encode($value);
+                        if (!empty($value)) {
+                            $value = explode(",", $value);
+                            $jsonOpts[$column] = json_encode($value);
+                        }
                         break;
-
                     case 'show_onfrontpage':
                     case 'show_oncategory':
                     case 'show_onproduct':
                     case 'always_display':
-                        $jsonOpts[$column] = ($value==1) ? true : false;
+                        $jsonOpts[$column] = ($value == 1);
                         break;
                 }
             }

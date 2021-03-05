@@ -167,7 +167,6 @@
 </div>
 
 <script type="text/javascript">
- var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host;
     var url = decodeURIComponent("{$iframe_url|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost;
     var baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}");
