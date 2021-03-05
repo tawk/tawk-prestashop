@@ -215,6 +215,16 @@ class AdminTawktoController extends ModuleAdminController
 
         $visibilityOpts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}");
         if ($visibilityOpts) {
+            $visibilityOpts = Tools::jsonDecode($visibilityOpts);
+
+            $textareaIds = array('hide_oncustom', 'show_oncustom');
+            foreach ($textareaIds as $id) {
+                $opt = $visibilityOpts->{$id};
+                if (is_string($opt)) {
+                    $visibilityOpts->{$id} = Tools::jsonDecode($opt);
+                }
+            }
+
             $result['visibilityOpts'] = $visibilityOpts;
         }
 

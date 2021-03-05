@@ -242,11 +242,6 @@
                 var result = JSON.parse(data);
                 var updatedUrl = new URL(url);
 
-                var visibilityOpts = result.visibilityOpts
-                if (visibilityOpts) {
-                    visibilityOpts = JSON.parse(visibilityOpts);
-                }
-
                 updatedUrl.searchParams.set('currentWidgetId', result.widgetId || '');
                 updatedUrl.searchParams.set('currentPageId', result.pageId || '');
 
@@ -255,7 +250,7 @@
 
                 toggleSameUserWarning(result.sameUser);
                 toggleVisibilityForm(result.widgetId, result.pageId);
-                setVisibilityData(visibilityOpts);
+                setVisibilityData(result.visibilityOpts);
             })
             .error(function (xhr, status, err) {
                 errEl.html('Failed to retrieve current store\'s widget.');
@@ -384,9 +379,6 @@
                 if (tag === 'INPUT' && (type === 'checkbox' || type === 'radio')) {
                     el.prop('checked', value);
                 } else if (tag === 'TEXTAREA') {
-                    if (typeof value === 'string') {
-                        value = JSON.parse(value);
-                    }
                     el.val(value.join('\r\n'));
                 } else {
                     el.val(value);
