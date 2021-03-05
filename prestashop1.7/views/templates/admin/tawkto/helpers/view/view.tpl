@@ -183,8 +183,7 @@
         jQuery('#stores').change(function (e) {
             shopId = e.target.value;
             domain = shops[shopId].domain;
-            getStoreWidget();
-            getStoreVisibilityOpts();
+            getStoreWidgetConfig();
         });
 
         $('#module_form').submit(setVisibility);
@@ -218,18 +217,21 @@
 
     // Functions
     function setup() {
-        getStoreWidget();
-        getStoreVisibilityOpts();
+        getStoreWidgetConfig();
 
         $('#module_form').hide();
     }
 
-    function getStoreWidget() {
+    function getStoreWidgetConfig() {
         var errEl = $('#widget_error');
         errEl.hide();
+
+        var visibilityErrEl = $('#visibility_error');
+        visibilityErrEl.hide();
+
         var payload = {
             controller : 'AdminTawkto',
-            action : 'getStoreWidget',
+            action : 'getStoreWidgetConfig',
             ajax : true,
             shopId : parseInt(shopId),
             domain,
@@ -239,6 +241,12 @@
             .success(function (data) {
                 var result = JSON.parse(data);
                 var updatedUrl = new URL(url);
+
+                var visibilityOpts = result.visibilityOpts
+                if (visibilityOpts) {
+                    visibilityOpts = JSON.parse(visibilityOpts);
+                }
+
                 updatedUrl.searchParams.set('currentWidgetId', result.widgetId || '');
                 updatedUrl.searchParams.set('currentPageId', result.pageId || '');
 
@@ -247,58 +255,13 @@
 
                 toggleSameUserWarning(result.sameUser);
                 toggleVisibilityForm(result.widgetId, result.pageId);
+                setVisibilityData(visibilityOpts);
             })
             .error(function (xhr, status, err) {
                 errEl.html('Failed to retrieve current store\'s widget.');
                 errEl.show();
-            });
-    }
-
-    function getStoreVisibilityOpts() {
-        var errEl = $('#visibility_error');
-        errEl.hide();
-
-        var payload = {
-            controller : 'AdminTawkto',
-            action : 'getStoreVisibilityOpts',
-            ajax : true,
-            shopId : parseInt(shopId),
-            domain,
-            id_tab : currentIdTab
-        };
-        $.get(controller, payload)
-            .success(function (data) {
-                var result = JSON.parse(data);
-
-                if (!result) {
-                    setDefaultVisibilityFields();
-                } else {
-                    // bind values to specified elements
-                    for (var [key, value] of Object.entries(result)) {
-                        var el = $('#' + key);
-                        var tag = el.prop('tagName');
-                        var type = el.prop('type');
-
-                        if (tag === 'INPUT' && (type === 'checkbox' || type === 'radio')) {
-                            el.prop('checked', value);
-                        } else if (tag === 'TEXTAREA') {
-                            if (typeof value === 'string') {
-                                value = JSON.parse(value);
-                            }
-                            el.val(value.join('\r\n'));
-                        } else {
-                            el.val(value);
-                        }
-
-                        // trigers change event
-                        el.trigger('change');
-                    }
-                }
-
-            })
-            .error(function (xhr, status, err) {
-                errEl.html('Failed to retrieve visibility settings.');
-                errEl.show();
+                visibilityErrEl.html('Failed to retrieve visibility settings.');
+                visibilityErrEl.show();
             });
     }
 
@@ -405,6 +368,34 @@
         var alwaysDisplayEl = $('#always_display');
         alwaysDisplayEl.prop('checked', true);
         alwaysDisplayEl.trigger('change');
+    }
+
+
+    function setVisibilityData(options) {
+        if (!options) {
+            setDefaultVisibilityFields();
+        } else {
+            // bind values to specified elements
+            for (var [key, value] of Object.entries(options)) {
+                var el = $('#' + key);
+                var tag = el.prop('tagName');
+                var type = el.prop('type');
+
+                if (tag === 'INPUT' && (type === 'checkbox' || type === 'radio')) {
+                    el.prop('checked', value);
+                } else if (tag === 'TEXTAREA') {
+                    if (typeof value === 'string') {
+                        value = JSON.parse(value);
+                    }
+                    el.val(value.join('\r\n'));
+                } else {
+                    el.val(value);
+                }
+
+                // trigers change event
+                el.trigger('change');
+            }
+        }
     }
     {/literal}
 

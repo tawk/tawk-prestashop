@@ -188,27 +188,7 @@ class AdminTawktoController extends ModuleAdminController
         die(Tools::jsonEncode(array('success' => true)));
     }
 
-    public function displayAjaxGetStoreVisibilityOpts()
-    {
-        $result = null;
-        if (!Tools::getIsset('shopId')) {
-            die(Tools::jsonEncode($result));
-        }
-
-        $shopId = Tools::getValue('shopId');
-        $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}");
-
-        // this prevents $result to return $opts as 'false'.
-        if (!$opts) {
-            die(Tools::jsonEncode($result));
-        }
-        $result = $opts;
-
-        // already json encoded
-        die($result);
-    }
-
-    public function displayAjaxGetStoreWidget()
+    public function displayAjaxGetStoreWidgetConfig()
     {
         if (!Tools::getIsset('shopId')) {
             die(Tools::jsonEncode(null));
@@ -231,6 +211,11 @@ class AdminTawktoController extends ModuleAdminController
         $widgetId = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
         if ($widgetId) {
             $result['widgetId'] = $widgetId;
+        }
+
+        $visibilityOpts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS."_{$shopId}");
+        if ($visibilityOpts) {
+            $result['visibilityOpts'] = $visibilityOpts;
         }
 
         die(Tools::jsonEncode($result));
