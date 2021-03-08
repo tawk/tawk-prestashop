@@ -74,28 +74,16 @@ class Tawkto extends Module
 
     public function hookDisplayFooter()
     {
-        $shopId = Shop::getContextShopID(true);
-        if (is_null($shopId)) {
-            $shopId = 1;
-        }
-        $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
-        $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
+        $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID);
+        $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID);
 
         if (empty($pageId) || empty($widgetId)) {
             return '';
         }
 
-        // Check for visibility options
-        $sql = new DbQuery();
-        $sql->select('*');
-        $sql->from('configuration');
-        // function pSQL is prestashop's function for filtering/escaping input
-        $sql->where('name = "'.pSQL(self::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
-        $result =  Db::getInstance()->executeS($sql);
-
+        $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
         if ($result) {
-            $result = current($result);
-            $options = json_decode($result['value']);
+            $options = json_decode($result);
 
             // prepare visibility
             if (false==$options->always_display) {
@@ -150,22 +138,22 @@ class Tawkto extends Module
 
     public function uninstall()
     {
-        $shopIds = array(1);
-        $shops = Shop::getShops();
-        if ($shops && !empty($shops)) {
-            foreach ($shops as $shop) {
-                $shopIds[] = (int) $shop['id_shop'];
-            }
-            reset($shops);
-        }
-        foreach ($shopIds as $sid) {
-            Configuration::deleteByName(self::TAWKTO_WIDGET_PAGE_ID."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_WIDGET_ID."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_OPTS."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_USER."_{$sid}");
+        if (!parent::uninstall() || !$this->uninstallTab()) {
+            return false;
         }
 
-        return parent::uninstall() && $this->uninstallTab();
+        $keys = array(
+            self::TAWKTO_WIDGET_PAGE_ID,
+            self::TAWKTO_WIDGET_WIDGET_ID,
+            self::TAWKTO_WIDGET_OPTS,
+            self::TAWKTO_WIDGET_USER
+        );
+
+        foreach ($keys as $key) {
+            Configuration::deleteByName($key);
+        }
+
+        return true;
     }
 
     public function uninstallTab()
