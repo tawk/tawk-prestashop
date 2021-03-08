@@ -23,9 +23,9 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_2_0()
 {
-    $sql = 'UPDATE '._DB_PREFIX_.bqSQL(Configuration::$definition['table']).' conf
-            SET conf.name = REPLACE(conf.name, \'_1\', \'\')
-            WHERE conf.name LIKE \'TAWKTO_WIDGET_%\'';
+    $sql = "UPDATE "._DB_PREFIX_.bqSQL(Configuration::$definition['table'])." conf
+            SET conf.name = REPLACE(conf.name, '_1', '')
+            WHERE conf.name LIKE 'TAWKTO_WIDGET_%'";
     $result = Db::getInstance()->execute($sql); //returns boolean value
     return $result;
 }
