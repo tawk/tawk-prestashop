@@ -27,6 +27,7 @@ class Tawkto extends Module
     const TAWKTO_WIDGET_WIDGET_ID = 'TAWKTO_WIDGET_WIDGET_ID';
     const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
+    const TAWKTO_WIDGET_CURRENT = 'TAWKTO_WIDGET_CURRENT';
 
     public function __construct()
     {
@@ -74,12 +75,13 @@ class Tawkto extends Module
 
     public function hookDisplayFooter()
     {
-        $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID);
-        $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID);
-
-        if (empty($pageId) || empty($widgetId)) {
+        $current_widget = self::getPropertyAndWidget();
+        if (empty($current_widget)) {
             return '';
         }
+
+        $pageId = $current_widget['page_id'];
+        $widgetId = $current_widget['widget_id'];
 
         $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
         if ($result) {
@@ -143,8 +145,7 @@ class Tawkto extends Module
         }
 
         $keys = array(
-            self::TAWKTO_WIDGET_PAGE_ID,
-            self::TAWKTO_WIDGET_WIDGET_ID,
+            self::TAWKTO_WIDGET_CURRENT,
             self::TAWKTO_WIDGET_OPTS,
             self::TAWKTO_WIDGET_USER
         );
@@ -171,5 +172,24 @@ class Tawkto extends Module
     public function getContent()
     {
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminTawkto'));
+    }
+
+    public function getPropertyAndWidget()
+    {
+        $current_widget = Configuration::get(self::TAWKTO_WIDGET_CURRENT);
+        if (empty($current_widget)) {
+            return null;
+        }
+
+        $current_widget = explode(':', $current_widget);
+        if (count($current_widget) < 2) {
+            // this means that something went wrong when saving the property and widget.
+            return null;
+        }
+
+        return array(
+            'page_id' => $current_widget[0],
+            'widget_id' => $current_widget[1]
+        );
     }
 }

@@ -76,6 +76,14 @@ class AdminTawktoController extends ModuleAdminController
             $sameUser = false;
         }
 
+        $currentWidget = TawkTo::getPropertyAndWidget();
+        $pageId = '';
+        $widgetId = '';
+        if (!empty($currentWidget)) {
+            $pageId = $currentWidget['page_id'];
+            $widgetId = $currentWidget['widget_id'];
+        }
+
         $this->tpl_view_vars = array(
             'iframe_url' => $this->getIframeUrl(),
             'base_url' => $this->getBaseUrl(),
@@ -84,8 +92,8 @@ class AdminTawktoController extends ModuleAdminController
             'shops' => $shops,
             'domain' => $domain,
             'display_opts' => $displayOpts,
-            'page_id' => Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID),
-            'widget_id' => Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID),
+            'page_id' => $pageId,
+            'widget_id' => $widgetId,
             'same_user' => $sameUser
         );
 
@@ -99,12 +107,18 @@ class AdminTawktoController extends ModuleAdminController
 
     private function getIframeUrl()
     {
-        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID;
-        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID;
+        $currentWidget = TawkTo::getPropertyAndWidget();
+        $pageId = '';
+        $widgetId = '';
+        if (!empty($currentWidget)) {
+            $pageId = $currentWidget['page_id'];
+            $widgetId = $currentWidget['widget_id'];
+        }
+
         return $this->getBaseUrl()
             .'/generic/widgets'
-            .'?currentPageId='.Configuration::get($pageKey)
-            .'&currentWidgetId='.Configuration::get($widgetKey);
+            .'?currentPageId='.$pageId
+            .'&currentWidgetId='.$widgetId;
     }
 
     private function deleteGlobalConfig($key)
@@ -141,11 +155,8 @@ class AdminTawktoController extends ModuleAdminController
             die(Tools::jsonEncode(array('success' => false)));
         }
 
-        $pageKey = TawkTo::TAWKTO_WIDGET_PAGE_ID;
-        Configuration::updateValue($pageKey, $pageId);
-
-        $widgetKey = TawkTo::TAWKTO_WIDGET_WIDGET_ID;
-        Configuration::updateValue($widgetKey, $widgetId);
+        $currentWidgetKey = TawkTo::TAWKTO_WIDGET_CURRENT;
+        Configuration::updateValue($currentWidgetKey, $pageId.':'.$widgetId);
 
         $userKey = TawkTo::TAWKTO_WIDGET_USER;
         Configuration::updateValue($userKey, $this->context->employee->id);
@@ -156,8 +167,7 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessRemoveWidget()
     {
         $keys = array(
-            TawkTo::TAWKTO_WIDGET_PAGE_ID,
-            TawkTo::TAWKTO_WIDGET_WIDGET_ID,
+            TawkTo::TAWKTO_WIDGET_CURRENT,
             TawkTo::TAWKTO_WIDGET_USER
         );
 
