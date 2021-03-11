@@ -89,7 +89,6 @@ class AdminTawktoController extends ModuleAdminController
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
             'tab_id' => (int) $this->context->controller->id,
-            'shops' => $shops,
             'domain' => $domain,
             'display_opts' => $displayOpts,
             'page_id' => $pageId,
