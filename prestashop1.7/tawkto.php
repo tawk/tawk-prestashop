@@ -27,7 +27,7 @@ class Tawkto extends Module
     const TAWKTO_WIDGET_WIDGET_ID = 'TAWKTO_WIDGET_WIDGET_ID';
     const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
-    const TAWKTO_WIDGET_CURRENT = 'TAWKTO_WIDGET_CURRENT';
+    const TAWKTO_SELECTED_WIDGET = 'TAWKTO_SELECTED_WIDGET';
 
     public function __construct()
     {
@@ -174,7 +174,7 @@ class Tawkto extends Module
         }
 
         $keys = array(
-            self::TAWKTO_WIDGET_CURRENT,
+            self::TAWKTO_SELECTED_WIDGET,
             self::TAWKTO_WIDGET_OPTS,
             self::TAWKTO_WIDGET_USER
         );
@@ -205,7 +205,7 @@ class Tawkto extends Module
 
     public function getPropertyAndWidget()
     {
-        $current_widget = Configuration::get(self::TAWKTO_WIDGET_CURRENT);
+        $current_widget = Configuration::get(self::TAWKTO_SELECTED_WIDGET);
         if (empty($current_widget)) {
             return null;
         }

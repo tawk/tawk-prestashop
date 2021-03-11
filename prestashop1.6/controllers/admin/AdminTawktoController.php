@@ -153,7 +153,7 @@ class AdminTawktoController extends ModuleAdminController
             die(Tools::jsonEncode(array('success' => false)));
         }
 
-        $currentWidgetKey = TawkTo::TAWKTO_WIDGET_CURRENT;
+        $currentWidgetKey = TawkTo::TAWKTO_SELECTED_WIDGET;
         Configuration::updateValue($currentWidgetKey, $pageId.':'.$widgetId);
 
         $userKey = TawkTo::TAWKTO_WIDGET_USER;
@@ -165,7 +165,7 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessRemoveWidget()
     {
         $keys = array(
-            TawkTo::TAWKTO_WIDGET_CURRENT,
+            TawkTo::TAWKTO_SELECTED_WIDGET,
             TawkTo::TAWKTO_WIDGET_USER
         );
 

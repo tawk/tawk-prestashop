@@ -34,7 +34,7 @@ function upgrade_module_1_2_0()
     // force reload cache
     Configuration::loadConfiguration();
 
-    // insert the new records for TAWKTO_WIDGET_CURRENT.
+    // insert the new records for TAWKTO_SELECTED_WIDGET.
     $insert_records_result = insert_records();
     if (!$insert_records_result) {
         return false;
@@ -122,7 +122,7 @@ function modify_widget($shop_group_id = null, $shop_id = null)
     $page_id = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID, null, $shop_group_id, $shop_id);
     $widget_id = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID, null, $shop_group_id, $shop_id);
     return Configuration::updateValue(
-        TawkTo::TAWKTO_WIDGET_CURRENT,
+        TawkTo::TAWKTO_SELECTED_WIDGET,
         $page_id.':'.$widget_id,
         false,
         $shop_group_id,
