@@ -122,6 +122,31 @@
 <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
 
 <form id="module_form" action="" method="post">
+    <div class="panel">
+        <div class="panel-heading"> <i class="icon-eye-close"></i> Privacy Options </div>
+        <div class="form-wrapper row">
+            <div class="form-group row">
+                <label class="control-label col-lg-3">
+                    <span data-toggle="tooltip" data-html="true"
+                        title=""  data-original-title="Enable Visitor Recognition">
+                        Enable Visitor Recognition
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <div class="radio ">
+                        <label>
+                            <input type="checkbox" name="enable_visitor_recognition"
+                                id="enable_visitor_recognition" value="1"
+                                {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
+                                    checked
+                                {/if}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="panel" id="fieldset_1">
         <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
         <div class="form-wrapper row">
@@ -253,31 +278,6 @@
                         <br>
                         Add URLs to pages in which you would like to show the widget.<br>
                         Put each URL in a new line.<br>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="panel" id="fieldset_2">
-        <div class="panel-heading"> <i class="icon-eye-close"></i> Privacy Options </div>
-        <div class="form-wrapper row">
-            <div class="form-group row">
-                <label class="control-label col-lg-3">
-                    <span data-toggle="tooltip" data-html="true"
-                        title=""  data-original-title="Enable Visitor Recognition">
-                        Enable Visitor Recognition
-                    </span>
-                </label>
-                <div class="col-lg-9">
-                    <div class="radio ">
-                        <label>
-                            <input type="checkbox" name="enable_visitor_recognition"
-                                id="enable_visitor_recognition" value="1"
-                                {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
-                                    checked
-                                {/if}
-                            />
-                        </label>
                     </div>
                 </div>
             </div>
