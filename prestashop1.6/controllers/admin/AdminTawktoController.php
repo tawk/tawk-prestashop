@@ -119,23 +119,6 @@ class AdminTawktoController extends ModuleAdminController
             .'&currentWidgetId='.$widgetId;
     }
 
-    private function deleteGlobalConfig($key)
-    {
-        // This is extracted from Configuration::deleteFromContext method.
-
-        $table = bqSQL(Configuration::$definition['table']);
-        $primary = bqSQL(Configuration::$definition['primary']);
-
-        // The nulls here are the shop id and shop group id
-        $id = (int) Configuration::getIdByName($key, null, null);
-
-        // Delete record from configuration
-        Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.$table.'` WHERE `'.$primary.'` = '.(int)$id);
-
-        // Delete record from configuration_lang
-        Db::getInstance()->execute('DELETE FROM `'._DB_PREFIX_.$table.'_lang` WHERE `'.$primary.'` = '.(int)$id);
-    }
-
     private static function idsAreCorrect($pageId, $widgetId)
     {
         return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
@@ -171,7 +154,7 @@ class AdminTawktoController extends ModuleAdminController
 
         foreach ($keys as $key) {
             if (Shop::getContext() == Shop::CONTEXT_ALL) {
-                $this->deleteGlobalConfig($key);
+                Configuration::updateValue($key, '');
             } else {
                 // Configuration::deleteFromContext method cannot be used by
                 // 'All Shops' or the current shop context is 'CONTEXT_ALL'.
