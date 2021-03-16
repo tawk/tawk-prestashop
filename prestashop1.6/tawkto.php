@@ -84,8 +84,13 @@ class Tawkto extends Module
         $widgetId = $current_widget['widget_id'];
 
         $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
+        $enable_visitor_recognition = true; // default value
         if ($result) {
             $options = json_decode($result);
+
+            if (!is_null($options->enable_visitor_recognition)) {
+                $enable_visitor_recognition = $options->enable_visitor_recognition;
+            }
 
             // prepare visibility
             if (false==$options->always_display) {
@@ -122,7 +127,7 @@ class Tawkto extends Module
         // add customer details as visitor info
         $customer_name = null;
         $customer_email = null;
-        if (!is_null($this->context->customer->id)) {
+        if ($enable_visitor_recognition && !is_null($this->context->customer->id)) {
             $customer = $this->context->customer;
             $customer_name = $customer->firstname.' '.$customer->lastname;
             $customer_email = $customer->email;

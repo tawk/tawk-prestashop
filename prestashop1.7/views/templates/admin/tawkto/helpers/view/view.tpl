@@ -22,6 +22,13 @@
 <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
 {/if}
 
+<style>
+#module_form .radio {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+</style>
+
 <iframe
     id="tawkIframe"
     src=""
@@ -117,6 +124,31 @@
 <div style="float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;{if $page_id && $widget_id}display:none;{/if}" class="alert alert-warning visibility_warning">Please set the chat widget using the form above, to enable the chat visibility options.</div>
 
 <form id="module_form" action="" method="post">
+    <div class="panel">
+        <div class="panel-heading"> <i class="icon-eye-close"></i> Privacy Options </div>
+        <div class="form-wrapper row">
+            <div class="form-group row">
+                <label class="control-label col-lg-3">
+                    <span data-toggle="tooltip" data-html="true"
+                        title=""  data-original-title="Enable Visitor Recognition">
+                        Enable Visitor Recognition
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <div class="radio ">
+                        <label>
+                            <input type="checkbox" name="enable_visitor_recognition"
+                                id="enable_visitor_recognition" value="1"
+                                {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
+                                    checked
+                                {/if}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="panel" id="fieldset_1">
         <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
         <div class="form-wrapper row">
@@ -251,14 +283,13 @@
                     </div>
                 </div>
             </div>
-
-        </div><!-- end form-wrapper -->
+        </div>
         <div class="panel-footer">
             <div id="optionsSuccessMessage" style="width: 50%; float: left; background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success">Successfully set widget options to your site</div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
-    </div>
+    </div><!-- end form-wrapper -->
 </form>
 <script>
 
