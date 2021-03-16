@@ -27,12 +27,13 @@ class Tawkto extends Module
     const TAWKTO_WIDGET_WIDGET_ID = 'TAWKTO_WIDGET_WIDGET_ID';
     const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
+    const TAWKTO_SELECTED_WIDGET = 'TAWKTO_SELECTED_WIDGET';
 
     public function __construct()
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.2.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
@@ -74,29 +75,18 @@ class Tawkto extends Module
 
     public function hookDisplayFooter()
     {
-        $shopId = Shop::getContextShopID(true);
-        if (is_null($shopId)) {
-            $shopId = 1;
-        }
-        $pageId = Configuration::get(self::TAWKTO_WIDGET_PAGE_ID."_{$shopId}");
-        $widgetId = Configuration::get(self::TAWKTO_WIDGET_WIDGET_ID."_{$shopId}");
-
-        if (empty($pageId) || empty($widgetId)) {
+        $current_widget = self::getPropertyAndWidget();
+        if (empty($current_widget)) {
             return '';
         }
 
-        // Check for visibility options
-        $sql = new DbQuery();
-        $sql->select('*');
-        $sql->from('configuration');
-        // function pSQL is prestashop's function for filtering/escaping input
-        $sql->where('name = "'.pSQL(self::TAWKTO_WIDGET_OPTS."_{$shopId}").'"');
-        $result =  Db::getInstance()->executeS($sql);
-        $enable_visitor_recognition = true; // default value
+        $pageId = $current_widget['page_id'];
+        $widgetId = $current_widget['widget_id'];
 
+        $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
+        $enable_visitor_recognition = true; // default value
         if ($result) {
-            $result = current($result);
-            $options = json_decode($result['value']);
+            $options = json_decode($result);
 
             if (!is_null($options->enable_visitor_recognition)) {
                 $enable_visitor_recognition = $options->enable_visitor_recognition;
@@ -155,22 +145,21 @@ class Tawkto extends Module
 
     public function uninstall()
     {
-        $shopIds = array(1);
-        $shops = Shop::getShops();
-        if ($shops && !empty($shops)) {
-            foreach ($shops as $shop) {
-                $shopIds[] = (int) $shop['id_shop'];
-            }
-            reset($shops);
-        }
-        foreach ($shopIds as $sid) {
-            Configuration::deleteByName(self::TAWKTO_WIDGET_PAGE_ID."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_WIDGET_ID."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_OPTS."_{$sid}");
-            Configuration::deleteByName(self::TAWKTO_WIDGET_USER."_{$sid}");
+        if (!parent::uninstall() || !$this->uninstallTab()) {
+            return false;
         }
 
-        return parent::uninstall() && $this->uninstallTab();
+        $keys = array(
+            self::TAWKTO_SELECTED_WIDGET,
+            self::TAWKTO_WIDGET_OPTS,
+            self::TAWKTO_WIDGET_USER
+        );
+
+        foreach ($keys as $key) {
+            Configuration::deleteByName($key);
+        }
+
+        return true;
     }
 
     public function uninstallTab()
@@ -188,5 +177,24 @@ class Tawkto extends Module
     public function getContent()
     {
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminTawkto'));
+    }
+
+    public function getPropertyAndWidget()
+    {
+        $current_widget = Configuration::get(self::TAWKTO_SELECTED_WIDGET);
+        if (empty($current_widget)) {
+            return null;
+        }
+
+        $current_widget = explode(':', $current_widget);
+        if (count($current_widget) < 2) {
+            // this means that something went wrong when saving the property and widget.
+            return null;
+        }
+
+        return array(
+            'page_id' => $current_widget[0],
+            'widget_id' => $current_widget[1]
+        );
     }
 }

@@ -83,7 +83,8 @@
 
                     $('input[name="page_id"]').val(e.data.pageId);
                     $('input[name="widget_id"]').val(e.data.widgetId);
-                    $('#module_form, .visibility_warning').toggle();
+                    $('.visibility_warning').hide();
+                    $('#module_form').show();
                 } else {
                     e.source.postMessage({action: 'setFail'} , baseUrl);
                 }
@@ -109,7 +110,8 @@
 
                     $('input[name="page_id"]').val(e.data.pageId);
                     $('input[name="widget_id"]').val(e.data.widgetId);
-                    $('#module_form, .visibility_warning').toggle();
+                    $('.visibility_warning').show();
+                    $('#module_form').hide();
                 } else {
                     e.source.postMessage({action: 'removeFail'} , baseUrl);
                 }
