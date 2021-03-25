@@ -58,6 +58,10 @@
             if(e.data.action === 'removeWidget') {
                 removeWidget(e);
             }
+
+            if(e.data.action === 'reloadHeight') {
+                reloadIframeHeight(e.data.height);
+            }
         }
     });
 
@@ -110,6 +114,19 @@
                 }
             }
         });
+    }
+
+    function reloadIframeHeight(height) {
+        if (!height) {
+            return;
+        }
+
+        var iframe = jQuery('#tawkIframe');
+        if (height === iframe.height()) {
+            return;
+        }
+
+        iframe.height(height);
     }
     {/literal}
 </script>
