@@ -39,7 +39,7 @@
 <script>
     var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host,
-        url = decodeURIComponent("{$iframe_url|cat:'&platform=prestashop17&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
+        url = decodeURIComponent("{$iframe_url|cat:'&pltf=prestashop&pltfv=1.7&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
         baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}"),
         current_id_tab = "{$tab_id|escape:'javascript':'UTF-8'}",
         controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");
