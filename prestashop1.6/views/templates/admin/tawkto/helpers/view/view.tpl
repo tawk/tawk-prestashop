@@ -39,7 +39,7 @@
 <script type="text/javascript">
     var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host,
-        url = decodeURIComponent("{$iframe_url|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
+        url = decodeURIComponent("{$iframe_url|cat:'&pltf=prestashop&pltfv=1.6&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
         baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}"),
         current_id_tab = "{$tab_id|escape:'javascript':'UTF-8'}",
         controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");
@@ -57,6 +57,10 @@
 
             if(e.data.action === 'removeWidget') {
                 removeWidget(e);
+            }
+
+            if(e.data.action === 'reloadHeight') {
+                reloadIframeHeight(e.data.height);
             }
         }
     });
@@ -110,6 +114,19 @@
                 }
             }
         });
+    }
+
+    function reloadIframeHeight(height) {
+        if (!height) {
+            return;
+        }
+
+        var iframe = jQuery('#tawkIframe');
+        if (height === iframe.height()) {
+            return;
+        }
+
+        iframe.height(height);
     }
     {/literal}
 </script>
