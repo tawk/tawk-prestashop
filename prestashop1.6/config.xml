@@ -2,7 +2,7 @@
 <module>
 	<name>tawkto</name>
 	<displayName><![CDATA[tawk.to]]></displayName>
-	<version><![CDATA[1.2.1]]></version>
+	<version><![CDATA[1.2.2]]></version>
 	<description><![CDATA[tawk.to live chat integration.]]></description>
 	<author><![CDATA[tawk.to]]></author>
 	<tab><![CDATA[front_office_features]]></tab>

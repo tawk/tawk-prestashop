@@ -33,7 +33,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.1';
+        $this->version = '1.2.2';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
@@ -88,7 +88,7 @@ class Tawkto extends Module
             $options = json_decode($result);
             $current_page = (string) $_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
 
-            if (!is_null($options->enable_visitor_recognition)) {
+            if (isset($options->enable_visitor_recognition)) {
                 $enable_visitor_recognition = $options->enable_visitor_recognition;
             }
 
