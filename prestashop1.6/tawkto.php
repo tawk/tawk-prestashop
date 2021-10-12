@@ -33,7 +33,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.2';
+        $this->version = '1.2.3';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
@@ -109,9 +109,14 @@ class Tawkto extends Module
                         return;
                     }
                 }
-                $showPages = json_decode($options->show_oncustom);
+                // show on specified urls
+                $show_pages = $options->show_oncustom;
+                if (!is_array($show_pages)) {
+                    $show_pages = json_decode($show_pages);
+                }
+
                 $show = false;
-                foreach ($showPages as $slug) {
+                foreach ($show_pages as $slug) {
                     if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
                         $show = true;
                         break;

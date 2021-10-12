@@ -33,7 +33,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.2';
+        $this->version = '1.2.3';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
@@ -95,9 +95,13 @@ class Tawkto extends Module
             // prepare visibility
             if (false==$options->always_display) {
                 // show on specified urls
-                $showPages = json_decode($options->show_oncustom);
+                $show_pages = $options->show_oncustom;
+                if (!is_array($show_pages)) {
+                    $show_pages = json_decode($show_pages);
+                }
+
                 $show = false;
-                foreach ($showPages as $slug) {
+                foreach ($show_pages as $slug) {
                     if (!empty($slug)) {
                         $slug = str_ireplace(array('http://','https://'), '', $slug);
                         if (stripos($current_page, $slug)!==false) {
@@ -132,9 +136,12 @@ class Tawkto extends Module
                 }
             } else {
                 // hide on specified urls
-                $hide_pages = json_decode($options->hide_oncustom);
-                $show = true;
+                $hide_pages = $options->hide_oncustom;
+                if (!is_array($hide_pages)) {
+                    $hide_pages = json_decode($hide_pages);
+                }
 
+                $show = true;
                 foreach ($hide_pages as $slug) {
                     // we need to add htmlspecialchars due to slashes added when saving to database
                     $slug = (string) htmlspecialchars($slug);
