@@ -110,18 +110,13 @@ class Tawkto extends Module
                     }
                 }
                 // show on specified urls
-                $show_pages = $options->show_oncustom;
-                if (is_string($show_pages)) {
-                    $show_pages = json_decode($show_pages);
-                }
+                $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                if (is_array($show_pages)) {
-                    foreach ($show_pages as $slug) {
-                        if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
-                            $show = true;
-                            break;
-                        }
+                foreach ($show_pages as $slug) {
+                    if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
+                        $show = true;
+                        break;
                     }
                 }
 
@@ -203,5 +198,18 @@ class Tawkto extends Module
             'page_id' => $current_widget[0],
             'widget_id' => $current_widget[1]
         );
+    }
+
+    private function getArrayFromJson($data) {
+        $arr = array();
+        if (is_string($data)) {
+            $data = json_decode($data);
+        }
+
+        if (is_array($data)) {
+            $arr = $data;
+        }
+
+        return $arr;
     }
 }

@@ -95,20 +95,15 @@ class Tawkto extends Module
             // prepare visibility
             if (false==$options->always_display) {
                 // show on specified urls
-                $show_pages = $options->show_oncustom;
-                if (is_string($show_pages)) {
-                    $show_pages = json_decode($show_pages);
-                }
+                $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                if (is_array($show_pages)) {
-                    foreach ($show_pages as $slug) {
-                        if (!empty($slug)) {
-                            $slug = str_ireplace(array('http://','https://'), '', $slug);
-                            if (stripos($current_page, $slug)!==false) {
-                                $show = true;
-                                break;
-                            }
+                foreach ($show_pages as $slug) {
+                    if (!empty($slug)) {
+                        $slug = str_ireplace(array('http://','https://'), '', $slug);
+                        if (stripos($current_page, $slug)!==false) {
+                            $show = true;
+                            break;
                         }
                     }
                 }
@@ -138,22 +133,17 @@ class Tawkto extends Module
                 }
             } else {
                 // hide on specified urls
-                $hide_pages = $options->hide_oncustom;
-                if (is_string($hide_pages)) {
-                    $hide_pages = json_decode($hide_pages);
-                }
+                $hide_pages = $this->getArrayFromJson($options->hide_oncustom);
 
                 $show = true;
-                if (is_array($hide_pages)) {
-                    foreach ($hide_pages as $slug) {
-                        // we need to add htmlspecialchars due to slashes added when saving to database
-                        $slug = (string) htmlspecialchars($slug);
-                        if (!empty($slug)) {
-                            $slug = str_ireplace(array('http://','https://'), '', $slug);
-                            if (stripos($current_page, $slug)!==false) {
-                                $show = false;
-                                break;
-                            }
+                foreach ($hide_pages as $slug) {
+                    // we need to add htmlspecialchars due to slashes added when saving to database
+                    $slug = (string) htmlspecialchars($slug);
+                    if (!empty($slug)) {
+                        $slug = str_ireplace(array('http://','https://'), '', $slug);
+                        if (stripos($current_page, $slug)!==false) {
+                            $show = false;
+                            break;
                         }
                     }
                 }
@@ -236,5 +226,18 @@ class Tawkto extends Module
             'page_id' => $current_widget[0],
             'widget_id' => $current_widget[1]
         );
+    }
+
+    private function getArrayFromJson($data) {
+        $arr = array();
+        if (is_string($data)) {
+            $data = json_decode($data);
+        }
+
+        if (is_array($data)) {
+            $arr = $data;
+        }
+
+        return $arr;
     }
 }
