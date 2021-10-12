@@ -96,17 +96,19 @@ class Tawkto extends Module
             if (false==$options->always_display) {
                 // show on specified urls
                 $show_pages = $options->show_oncustom;
-                if (!is_array($show_pages)) {
+                if (is_string($show_pages)) {
                     $show_pages = json_decode($show_pages);
                 }
 
                 $show = false;
-                foreach ($show_pages as $slug) {
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(array('http://','https://'), '', $slug);
-                        if (stripos($current_page, $slug)!==false) {
-                            $show = true;
-                            break;
+                if (is_array($show_pages)) {
+                    foreach ($show_pages as $slug) {
+                        if (!empty($slug)) {
+                            $slug = str_ireplace(array('http://','https://'), '', $slug);
+                            if (stripos($current_page, $slug)!==false) {
+                                $show = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -137,19 +139,21 @@ class Tawkto extends Module
             } else {
                 // hide on specified urls
                 $hide_pages = $options->hide_oncustom;
-                if (!is_array($hide_pages)) {
+                if (is_string($hide_pages)) {
                     $hide_pages = json_decode($hide_pages);
                 }
 
                 $show = true;
-                foreach ($hide_pages as $slug) {
-                    // we need to add htmlspecialchars due to slashes added when saving to database
-                    $slug = (string) htmlspecialchars($slug);
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(array('http://','https://'), '', $slug);
-                        if (stripos($current_page, $slug)!==false) {
-                            $show = false;
-                            break;
+                if (is_array($hide_pages)) {
+                    foreach ($hide_pages as $slug) {
+                        // we need to add htmlspecialchars due to slashes added when saving to database
+                        $slug = (string) htmlspecialchars($slug);
+                        if (!empty($slug)) {
+                            $slug = str_ireplace(array('http://','https://'), '', $slug);
+                            if (stripos($current_page, $slug)!==false) {
+                                $show = false;
+                                break;
+                            }
                         }
                     }
                 }

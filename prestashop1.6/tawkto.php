@@ -111,15 +111,17 @@ class Tawkto extends Module
                 }
                 // show on specified urls
                 $show_pages = $options->show_oncustom;
-                if (!is_array($show_pages)) {
+                if (is_string($show_pages)) {
                     $show_pages = json_decode($show_pages);
                 }
 
                 $show = false;
-                foreach ($show_pages as $slug) {
-                    if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
-                        $show = true;
-                        break;
+                if (is_array($show_pages)) {
+                    foreach ($show_pages as $slug) {
+                        if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
+                            $show = true;
+                            break;
+                        }
                     }
                 }
 
