@@ -79,11 +79,11 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
     $opts = json_decode($opts);
 
     if (isset($opts->show_oncustom) && is_array($opts->show_oncustom) && $opts->show_oncustom === array()) {
-        $opts->show_oncustom = '[]';
+        $opts->show_oncustom = json_encode(array());
     }
 
     if (isset($opts->hide_oncustom) && is_array($opts->hide_oncustom) && $opts->hide_oncustom === array()) {
-        $opts->hide_oncustom = '[]';
+        $opts->hide_oncustom = json_encode(array());
     }
 
     return Configuration::updateValue(

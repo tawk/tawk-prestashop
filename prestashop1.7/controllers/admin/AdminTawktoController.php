@@ -171,11 +171,11 @@ class AdminTawktoController extends ModuleAdminController
     {
         $jsonOpts = array(
             'always_display' => false,
-            'hide_oncustom' => '[]',
+            'hide_oncustom' => json_encode(array()),
             'show_onfrontpage' => false,
             'show_oncategory' => false,
             'show_onproduct' => false,
-            'show_oncustom' => '[]',
+            'show_oncustom' => json_encode(array()),
             'enable_visitor_recognition' => false
         );
 
