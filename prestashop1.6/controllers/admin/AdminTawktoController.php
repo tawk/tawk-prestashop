@@ -173,7 +173,7 @@ class AdminTawktoController extends ModuleAdminController
             'show_onfrontpage' => false,
             'show_oncategory' => false,
             'show_onproduct' => false,
-            'show_oncustom' => array(),
+            'show_oncustom' => '[]',
             'enable_visitor_recognition' => false
         );
 
