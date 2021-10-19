@@ -200,7 +200,8 @@ class Tawkto extends Module
         );
     }
 
-    private function getArrayFromJson($data) {
+    private function getArrayFromJson($data)
+    {
         $arr = array();
         if (is_string($data)) {
             $data = json_decode($data);

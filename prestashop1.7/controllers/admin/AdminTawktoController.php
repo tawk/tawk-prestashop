@@ -171,11 +171,19 @@ class AdminTawktoController extends ModuleAdminController
     {
         $jsonOpts = array(
             'always_display' => false,
+
+            // default value needs to be a json encoded of an empty array
+            // since we're going to save a json encoded array later on.
             'hide_oncustom' => json_encode(array()),
+
             'show_onfrontpage' => false,
             'show_oncategory' => false,
             'show_onproduct' => false,
+
+            // default value needs to be a json encoded of an empty array
+            // since we're going to save a json encoded array later on.
             'show_oncustom' => json_encode(array()),
+
             'enable_visitor_recognition' => false
         );
 

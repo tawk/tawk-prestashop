@@ -23,8 +23,6 @@ if (!defined('_PS_VERSION_')) {
 
 function upgrade_module_1_2_3()
 {
-    $db = Db::getInstance();
-
     // update the records for TAWKTO_WIDGET_OPTS.
     $update_records_result = update_records();
     if (!$update_records_result) {
