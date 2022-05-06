@@ -1,25 +1,29 @@
 <?php
 /**
- * tawk.to
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to support@tawk.to so we can send you a copy immediately.
- *
- * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2021 tawk.to
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
+* tawk.to
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@tawk.to so we can send you a copy immediately.
+*
+* @author tawkto support@tawk.to
+* @copyright Copyright (c) 2014-2022 tawk.to
+* @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once _PS_MODULE_DIR_ . 'tawkto/vendor/autoload.php';
+
+use Tawk\Modules\UrlPatternMatcher;
 
 class Tawkto extends Module
 {
@@ -33,7 +37,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.3';
+        $this->version = '1.3.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
@@ -98,14 +102,8 @@ class Tawkto extends Module
                 $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                foreach ($show_pages as $slug) {
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(array('http://','https://'), '', $slug);
-                        if (stripos($current_page, $slug)!==false) {
-                            $show = true;
-                            break;
-                        }
-                    }
+                if (UrlPatternMatcher::match($current_page, $show_pages)) {
+                    $show = true;
                 }
 
                 if (!$show) {
@@ -136,16 +134,8 @@ class Tawkto extends Module
                 $hide_pages = $this->getArrayFromJson($options->hide_oncustom);
 
                 $show = true;
-                foreach ($hide_pages as $slug) {
-                    // we need to add htmlspecialchars due to slashes added when saving to database
-                    $slug = (string) htmlspecialchars($slug);
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(array('http://','https://'), '', $slug);
-                        if (stripos($current_page, $slug)!==false) {
-                            $show = false;
-                            break;
-                        }
-                    }
+                if (UrlPatternMatcher::match($current_page, $hide_pages)) {
+                    $show = false;
                 }
 
                 if (!$show) {
