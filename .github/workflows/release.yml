@@ -16,6 +16,7 @@ jobs:
         id: cached-dependencies
         with:
           path: |
+            ./vendor
             ./prestashop1.6/vendor
             ./prestashop1.7/vendor
           # the key will change if composer.lock changes
@@ -42,6 +43,7 @@ jobs:
         id: cached-dependencies
         with:
           path: |
+            ./vendor
             ./prestashop1.6/vendor
             ./prestashop1.7/vendor
           # the key will change if composer.lock changes
