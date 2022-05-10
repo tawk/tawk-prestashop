@@ -82,7 +82,6 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
 
     $opts = json_decode($opts);
 
-
     if (isset($opts->show_oncustom)) {
         $show_oncustom = json_decode($opts->show_oncustom);
         if (is_array($show_oncustom)) {
@@ -106,9 +105,23 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
     );
 }
 
+function checkPatternListHasWildcard($patternList, $wildcard) {
+    foreach ($patternList as $pattern) {
+        if (strpos($pattern, $wildcard) > -1) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function addWildcardToPatternList($patternList, $storeHost)
 {
     $wildcard = PathHelper::get_wildcard();
+
+    if (checkPatternListHasWildcard($patternList, $wildcard)) {
+        return json_encode($patternList);
+    }
 
     $newPatternList = [];
     $addedPatterns = [];
@@ -144,7 +157,7 @@ function addWildcardToPatternList($patternList, $storeHost)
             continue;
         }
 
-        $newPatternList[]             = $newPattern;
+        $newPatternList[] = $newPattern;
         $addedPatterns[$newPattern] = true;
     }
 
