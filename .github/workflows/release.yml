@@ -48,7 +48,7 @@ jobs:
           key: ${{ runner.os }}-dependencies-${{ hashFiles('**/composer.lock') }}
 
       - name: build artifact
-        run: composer run autoindex && ./build/build-package.sh
+        run: composer run auto-index && ./build/build-package.sh
 
       - name: set version for prestashop ${{ matrix.ps_version }}
         id: version
