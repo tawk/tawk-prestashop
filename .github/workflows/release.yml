@@ -51,8 +51,8 @@ jobs:
         run: composer run autoindex && ./build/build-package.sh
 
       - name: set version for prestashop ${{ matrix.ps_version }}
-        id: version-${{ matrix.ps_version }}
-        run: echo "::set-output name=version-${{ matrix.ps_version }}::$(awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' ./prestashop${{ matrix.ps_version }}/config.xml | xargs)"
+        id: version
+        run: echo "::set-output name=version::$(awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' ./prestashop${{ matrix.ps_version }}/config.xml | xargs)"
 
       - name: upload prestashop ${{ matrix.ps_version }} artifact
         uses: actions/upload-release-asset@v1
@@ -60,6 +60,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version${{ matrix.ps_version }} }}.zip
-          asset_name: tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version${{ matrix.ps_version }} }}.zip
+          asset_path: ./build/tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
+          asset_name: tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
           asset_content_type: application/zip
