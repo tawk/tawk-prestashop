@@ -73,8 +73,6 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
     }
 
     $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS, null, $shop_group_id, $shop_id);
-    $base_url = parse_url(Context::getContext()->shop->getBaseURL(true));
-    $shop_host = $base_url['host'] . ':' . $base_url['port'];
 
     if (!$opts) {
         return false;
@@ -82,18 +80,17 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
 
     $opts = json_decode($opts);
 
-
     if (isset($opts->show_oncustom)) {
         $show_oncustom = json_decode($opts->show_oncustom);
         if (is_array($show_oncustom)) {
-            $opts->show_oncustom = addWildcardToPatternList($show_oncustom, $shop_host);
+            $opts->show_oncustom = addWildcardToPatternList($show_oncustom);
         }
     }
 
     if (isset($opts->hide_oncustom)) {
         $hide_oncustom = json_decode($opts->hide_oncustom);
         if (is_array($hide_oncustom)) {
-            $opts->hide_oncustom = addWildcardToPatternList($hide_oncustom, $shop_host);
+            $opts->hide_oncustom = addWildcardToPatternList($hide_oncustom);
         }
     }
 
@@ -116,7 +113,7 @@ function checkPatternListHasWildcard($patternList, $wildcard) {
     return false;
 }
 
-function addWildcardToPatternList($patternList, $storeHost)
+function addWildcardToPatternList($patternList)
 {
     $wildcard = PathHelper::get_wildcard();
 
@@ -143,7 +140,8 @@ function addWildcardToPatternList($patternList, $storeHost)
             // If not, add a leading / so that the pattern
             // matcher treats is as a path.
             $firstPatternChunk = explode('/', $pattern)[0];
-            if ($firstPatternChunk !== $storeHost) {
+
+            if (checkValidHost($firstPatternChunk) === false) {
                 $pattern = '/' . $pattern;
             }
         }
@@ -164,4 +162,22 @@ function addWildcardToPatternList($patternList, $storeHost)
 
     // EOL for display purposes
     return json_encode($newPatternList);
+}
+
+function checkValidHost($host) {
+    // contains port
+    if (strpos($host, ':') < 0) {
+        return true;
+    }
+
+    // is localhost
+    if (strpos($host, 'localhost') === 0) {
+        return true;
+    }
+
+    // gotten from https://forums.digitalpoint.com/threads/what-will-be-preg_match-for-domain-names.1953314/#post-15036873
+    // but updated the ending regex part to include numbers so it also matches IPs.
+    $host_check_regex = '/^[a-zA-Z0-9]*((-|\.)?[a-zA-Z0-9])*\.([a-zA-Z0-9]{1,4})$/';
+
+    return preg_match($host_check_regex, $host) > 0;
 }
