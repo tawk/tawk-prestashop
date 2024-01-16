@@ -68,7 +68,7 @@ class AdminTawktoController extends ModuleAdminController
         if (!$displayOpts) {
             $displayOpts = null;
         }
-        $displayOpts = Tools::jsonDecode($displayOpts);
+        $displayOpts = json_decode($displayOpts);
 
         $sameUser = true; // assuming there is only one admin by default
         $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
@@ -128,13 +128,13 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessSetWidget()
     {
         if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
-            die(Tools::jsonEncode(array('success' => false)));
+            die(json_encode(array('success' => false)));
         }
 
         $pageId = Tools::getValue('pageId');
         $widgetId = Tools::getValue('widgetId');
         if (!self::idsAreCorrect($pageId, $widgetId)) {
-            die(Tools::jsonEncode(array('success' => false)));
+            die(json_encode(array('success' => false)));
         }
 
         $currentWidgetKey = TawkTo::TAWKTO_SELECTED_WIDGET;
@@ -143,7 +143,7 @@ class AdminTawktoController extends ModuleAdminController
         $userKey = TawkTo::TAWKTO_WIDGET_USER;
         Configuration::updateValue($userKey, $this->context->employee->id);
 
-        die(Tools::jsonEncode(array('success' => true)));
+        die(json_encode(array('success' => true)));
     }
 
     public function ajaxProcessRemoveWidget()
@@ -163,7 +163,7 @@ class AdminTawktoController extends ModuleAdminController
             }
         }
 
-        die(Tools::jsonEncode(array('success' => true)));
+        die(json_encode(array('success' => true)));
     }
 
 
@@ -217,6 +217,6 @@ class AdminTawktoController extends ModuleAdminController
         $key = TawkTo::TAWKTO_WIDGET_OPTS;
         Configuration::updateValue($key, json_encode($jsonOpts));
 
-        die(Tools::jsonEncode(array('success' => true)));
+        die(json_encode(array('success' => true)));
     }
 }

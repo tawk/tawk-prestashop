@@ -36,7 +36,7 @@ class Tawkto extends Module
         $this->version = '1.2.3';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '8.1.3');
 
         parent::__construct();
 
@@ -209,7 +209,7 @@ class Tawkto extends Module
         Tools::redirectAdmin($this->context->link->getAdminLink('AdminTawkto'));
     }
 
-    public function getPropertyAndWidget()
+    public static function getPropertyAndWidget()
     {
         $current_widget = Configuration::get(self::TAWKTO_SELECTED_WIDGET);
         if (empty($current_widget)) {
