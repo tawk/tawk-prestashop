@@ -45,8 +45,8 @@ class Tawkto extends Module
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-        if (!Configuration::get('MYMODULE_NAME')) {
-            $this->warning = $this->l('No name provided');
+        if (!Configuration::get(self::TAWKTO_SELECTED_WIDGET)) {
+            $this->warning = $this->l('No widget selected');
         }
     }
 
