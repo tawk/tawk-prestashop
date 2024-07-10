@@ -1,3 +1,4 @@
 *.zip
 ./build/tawkto
 **/vendor
+docker/bin
