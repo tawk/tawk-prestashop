@@ -38,12 +38,12 @@
   visibility: hidden;
   background-color: #545454;
   color: #fff;
-  text-align: center;
   padding: 0.5rem;
-  max-width: 300px;
+  width: 300px;
   border-radius: 0.5rem;
-  font-size: 0.7rem;
-  line-height: 0.9;
+  font-size: 0.8rem;
+  line-height: 1;
+  list-style-type: none;
 
   /* Position the tooltip text - see examples below! */
   position: absolute;

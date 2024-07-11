@@ -98,21 +98,6 @@ class Tawkto extends Module
 
             // prepare visibility
             if (false==$options->always_display) {
-                if ('index' == $this->context->controller->php_self) {
-                    if (false==$options->show_onfrontpage) {
-                        return;
-                    }
-                }
-                if ('category' == $this->context->controller->php_self) {
-                    if (false==$options->show_oncategory) {
-                        return;
-                    }
-                }
-                if ('product' == $this->context->controller->php_self) {
-                    if (false==$options->show_onproduct) {
-                        return;
-                    }
-                }
                 // show on specified urls
                 $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
@@ -120,6 +105,24 @@ class Tawkto extends Module
                 if (UrlPatternMatcher::match($_SERVER['REQUEST_URI'], $show_pages)) {
                     $show = true;
                 }
+
+				if (!$show) {
+					if ('index' == $this->context->controller->php_self) {
+						if (false == $options->show_onfrontpage) {
+							return;
+						}
+					}
+					if ('category' == $this->context->controller->php_self) {
+						if (false == $options->show_oncategory) {
+							return;
+						}
+					}
+					if ('product' == $this->context->controller->php_self) {
+						if (false == $options->show_onproduct) {
+							return;
+						}
+					}
+				}
 
                 if (!$show && !in_array($this->context->controller->php_self, array('index', 'category', 'product'))) {
                     return;
