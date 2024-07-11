@@ -12,7 +12,7 @@
  * to support@tawk.to so we can send you a copy immediately.
  *
  * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2021 tawk.to
+ * @copyright Copyright (c) 2014-2022 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *}
 
@@ -26,6 +26,46 @@
 #module_form .radio {
     margin-top: 0;
     margin-bottom: 0;
+}
+/* Tooltip */
+.tawk-tooltip {
+  position: relative;
+  display: inline;
+  color: #03a84e;
+}
+
+.tawk-tooltip .tawk-tooltiptext {
+  visibility: hidden;
+  background-color: #545454;
+  color: #fff;
+  padding: 0.5rem;
+  width: 300px;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1;
+  list-style-type: none;
+
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1000;
+  top: 12px;
+}
+
+.tawk-tooltip .tawk-tooltiptext::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #545454;
+  top: -5px;
+  left: 5px;
+}
+
+.tawk-tooltip:hover .tawk-tooltiptext {
+  visibility: visible;
 }
 </style>
 
@@ -207,10 +247,39 @@
                     {/if}
                     </label>
                     <br>
-                    <p style="text-align: justify;">
-                    Add URLs to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
-                    Put each URL in a new line.
-                    </p>
+                    <div style="text-align: justify;">
+                        Add URLs/paths to pages in which you would like to hide the widget. ( if "always show" is checked )<br>
+                        Put each URL/path in a new line. Paths should have a leading '/'.
+                        <br>
+                        <div class="tawk-tooltip">
+                            Examples of accepted path patterns
+                            <ul class="tawk-tooltiptext">
+                            <li>*</li>
+                            <li>*/to/somewhere</li>
+                            <li>/*/to/somewhere</li>
+                            <li>/path/*/somewhere</li>
+                            <li>/path/*/lead/*/somewhere</li>
+                            <li>/path/*/*/somewhere</li>
+                            <li>/path/to/*</li>
+                            <li>/path/to/*/</li>
+                            <li>*/to/*/page</li>
+                            <li>/*/to/*/page</li>
+                            <li>/path/*/other/*</li>
+                            <li>/path/*/other/*/</li>
+                            <li>http://www.example.com/</li>
+                            <li>http://www.example.com/*</li>
+                            <li>http://www.example.com/*/to/somewhere</li>
+                            <li>http://www.example.com/path/*/somewhere</li>
+                            <li>http://www.example.com/path/*/lead/*/somewhere</li>
+                            <li>http://www.example.com/path/*/*/somewhere</li>
+                            <li>http://www.example.com/path/to/*</li>
+                            <li>http://www.example.com/path/to/*/</li>
+                            <li>http://www.example.com/*/to/*/page</li>
+                            <li>http://www.example.com/path/*/other/*</li>
+                            <li>http://www.example.com/path/*/other/*/</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -295,8 +364,37 @@
                         {/if}
                         </label>
                         <br>
-                        Add URLs to pages in which you would like to show the widget.<br>
-                        Put each URL in a new line.<br>
+                        Add URLs/paths to pages in which you would like to show the widget.<br>
+                        Put each URL/path in a new line. Paths should have a leading '/'.
+                        <br>
+                        <div class="tawk-tooltip">
+                            Examples of accepted path patterns
+                            <ul class="tawk-tooltiptext">
+                            <li>*</li>
+                            <li>*/to/somewhere</li>
+                            <li>/*/to/somewhere</li>
+                            <li>/path/*/somewhere</li>
+                            <li>/path/*/lead/*/somewhere</li>
+                            <li>/path/*/*/somewhere</li>
+                            <li>/path/to/*</li>
+                            <li>/path/to/*/</li>
+                            <li>*/to/*/page</li>
+                            <li>/*/to/*/page</li>
+                            <li>/path/*/other/*</li>
+                            <li>/path/*/other/*/</li>
+                            <li>http://www.example.com/</li>
+                            <li>http://www.example.com/*</li>
+                            <li>http://www.example.com/*/to/somewhere</li>
+                            <li>http://www.example.com/path/*/somewhere</li>
+                            <li>http://www.example.com/path/*/lead/*/somewhere</li>
+                            <li>http://www.example.com/path/*/*/somewhere</li>
+                            <li>http://www.example.com/path/to/*</li>
+                            <li>http://www.example.com/path/to/*/</li>
+                            <li>http://www.example.com/*/to/*/page</li>
+                            <li>http://www.example.com/path/*/other/*</li>
+                            <li>http://www.example.com/path/*/other/*/</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

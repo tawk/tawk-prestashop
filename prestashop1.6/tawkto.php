@@ -1,25 +1,29 @@
 <?php
 /**
- * tawk.to
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to support@tawk.to so we can send you a copy immediately.
- *
- * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2021 tawk.to
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- */
+* tawk.to
+*
+* NOTICE OF LICENSE
+*
+* This source file is subject to the Open Software License (OSL 3.0)
+* that is bundled with this package in the file LICENSE.txt.
+* It is also available through the world-wide-web at this URL:
+* http://opensource.org/licenses/osl-3.0.php
+* If you did not receive a copy of the license and are unable to
+* obtain it through the world-wide-web, please send an email
+* to support@tawk.to so we can send you a copy immediately.
+*
+* @author tawkto support@tawk.to
+* @copyright Copyright (c) 2014-2022 tawk.to
+* @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+*/
 
 if (!defined('_PS_VERSION_')) {
     exit;
 }
+
+require_once _PS_MODULE_DIR_ . 'tawkto/vendor/autoload.php';
+
+use Tawk\Modules\UrlPatternMatcher;
 
 class Tawkto extends Module
 {
@@ -33,7 +37,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.2.3';
+        $this->version = '1.3.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.6');
@@ -94,31 +98,31 @@ class Tawkto extends Module
 
             // prepare visibility
             if (false==$options->always_display) {
-                if ('index' == $this->context->controller->php_self) {
-                    if (false==$options->show_onfrontpage) {
-                        return;
-                    }
-                }
-                if ('category' == $this->context->controller->php_self) {
-                    if (false==$options->show_oncategory) {
-                        return;
-                    }
-                }
-                if ('product' == $this->context->controller->php_self) {
-                    if (false==$options->show_onproduct) {
-                        return;
-                    }
-                }
                 // show on specified urls
                 $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                foreach ($show_pages as $slug) {
-                    if (stripos($_SERVER['REQUEST_URI'], $slug)!==false) {
-                        $show = true;
-                        break;
-                    }
+                if (UrlPatternMatcher::match($_SERVER['REQUEST_URI'], $show_pages)) {
+                    $show = true;
                 }
+
+				if (!$show) {
+					if ('index' == $this->context->controller->php_self) {
+						if (false == $options->show_onfrontpage) {
+							return;
+						}
+					}
+					if ('category' == $this->context->controller->php_self) {
+						if (false == $options->show_oncategory) {
+							return;
+						}
+					}
+					if ('product' == $this->context->controller->php_self) {
+						if (false == $options->show_onproduct) {
+							return;
+						}
+					}
+				}
 
                 if (!$show && !in_array($this->context->controller->php_self, array('index', 'category', 'product'))) {
                     return;

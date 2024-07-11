@@ -12,11 +12,11 @@
  * to support@tawk.to so we can send you a copy immediately.
  *
  * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2021 tawk.to
+ * @copyright Copyright (c) 2014-2022 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *}
 <!--Start of Tawk.to Script-->
-<script type="text/javascript">
+<script type="text/javascript" data-keepinline="true">
 var $_Tawk_API={},$_Tawk_LoadStart=new Date();
 (function(){
 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];

@@ -1,0 +1,28 @@
+{
+    "name": "tawk/tawk-prestashop",
+    "description": "Prestashop plugin for tawk.to",
+    "type": "project",
+    "repositories": {
+        "tawk-url-utils": {
+            "type": "vcs",
+            "url": "https://github.com/tawk/tawk-url-utils.git"
+        }
+    },
+    "require": {
+        "tawk/url-utils": "2.0.1"
+    },
+    "license": "AFL-3.0",
+    "scripts": {
+        "auto-index": "composer run auto-index:1.6 && composer run auto-index:1.7",
+        "auto-index:1.6": "autoindex prestashop:add:index ./prestashop1.6",
+        "auto-index:1.7": "autoindex prestashop:add:index ./prestashop1.7",
+        "build": "composer run build:dev && composer run build:prod",
+        "build:dev" : "composer install",
+        "build:prod" : "composer run build:1.6 && composer run build:1.7",
+        "build:1.6" : "COMPOSER_VENDOR_DIR=./prestashop1.6/vendor composer install --no-dev",
+        "build:1.7" : "COMPOSER_VENDOR_DIR=./prestashop1.7/vendor composer install --no-dev"
+    },
+    "require-dev": {
+        "prestashop/autoindex": "^2.0"
+    }
+}

@@ -12,28 +12,29 @@ services:
       MYSQL_PASSWORD: prestashop
 
   web:
-    build:
-      context: .
-      args:
-        PRESTASHOP_IMAGE_VERSION: ${PRESTASHOP_IMAGE_VERSION}
-        DB_SERVER_ARG: db
-        DB_USER_ARG: prestashop
-        DB_PASSWD_ARG: prestashop
-        DB_NAME_ARG: prestashop
-        PS_INSTALL_AUTO_ARG: 1
-        PS_FOLDER_ADMIN_ARG: admin_ps
-        PS_FOLDER_INSTALL_ARG: install_ps
-        PS_DOMAIN_ARG: localhost:8000
-        ADMIN_MAIL_ARG: admin@example.com
-        ADMIN_PASSWD_ARG: adminps
     depends_on:
       - db
+    image: prestashop/prestashop:${PRESTASHOP_IMAGE_VERSION}
     ports:
        - 8000:80
     volumes:
       - web_data:/var/www/html
+      - type: bind
+        source: ${PRESTASHOP_DIR}
+        target: /var/www/html/modules/tawkto
     links:
       - db
+    environment:
+      DB_SERVER: db
+      DB_USER: prestashop
+      DB_PASSWD: prestashop
+      DB_NAME: prestashop
+      PS_INSTALL_AUTO: 1
+      PS_FOLDER_ADMIN: admin_ps
+      PS_FOLDER_INSTALL: install_ps
+      PS_DOMAIN: localhost:8000
+      ADMIN_MAIL: admin@example.com
+      ADMIN_PASSWD: adminps
 
 volumes:
   db_data:
