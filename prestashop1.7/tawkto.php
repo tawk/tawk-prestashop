@@ -108,26 +108,26 @@ class Tawkto extends Module
 
                 if (!$show) {
                     if ('product' == $this->context->controller->php_self) {
-                        if (false==$options->show_onproduct) {
-                            return;
+                        if ($options->show_onproduct) {
+                            $show = true;
                         }
                     }
 
                     if ('category' == $this->context->controller->php_self) {
-                        if (false==$options->show_oncategory) {
-                            return;
+                        if ($options->show_oncategory) {
+                            $show = true;
                         }
                     }
 
                     if ('index' == $this->context->controller->php_self) {
-                        if (false==$options->show_onfrontpage) {
-                            return;
+                        if ($options->show_onfrontpage) {
+                            $show = true;
                         }
                     }
                 }
 
-                if (!$show && !in_array($this->context->controller->php_self, array('index', 'category', 'product'))) {
-                    return;
+                if (!$show) {
+                    return '';
                 }
             } else {
                 // hide on specified urls

@@ -106,26 +106,26 @@ class Tawkto extends Module
                     $show = true;
                 }
 
-				if (!$show) {
-					if ('index' == $this->context->controller->php_self) {
-						if (false == $options->show_onfrontpage) {
-							return;
-						}
-					}
-					if ('category' == $this->context->controller->php_self) {
-						if (false == $options->show_oncategory) {
-							return;
-						}
-					}
-					if ('product' == $this->context->controller->php_self) {
-						if (false == $options->show_onproduct) {
-							return;
-						}
-					}
-				}
+                if (!$show) {
+                    if ('index' == $this->context->controller->php_self) {
+                        if ($options->show_onfrontpage) {
+                            $show = true;
+                        }
+                    }
+                    if ('category' == $this->context->controller->php_self) {
+                        if ($options->show_oncategory) {
+                            $show = true;
+                        }
+                    }
+                    if ('product' == $this->context->controller->php_self) {
+                        if ($options->show_onproduct) {
+                            $show = true;
+                        }
+                    }
+                }
 
-                if (!$show && !in_array($this->context->controller->php_self, array('index', 'category', 'product'))) {
-                    return;
+                if (!$show) {
+                    return '';
                 }
             }
         }
