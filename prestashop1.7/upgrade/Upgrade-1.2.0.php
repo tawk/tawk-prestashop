@@ -1,4 +1,5 @@
 <?php
+
 /**
  * tawk.to
  *
@@ -18,122 +19,145 @@
  */
 
 if (!defined('_PS_VERSION_')) {
-    exit;
+  exit;
 }
 
-function upgrade_module_1_2_0()
-{
-    $db = Db::getInstance();
+/**
+ * Upgrade entry point
+ *
+ * @return boolean
+ */
+function upgrade_module_1_2_0() {
+  $db = Db::getInstance();
 
-    // remove the suffix first on the config key names.
-    $remove_suffix_result = remove_suffix($db);
-    if (!$remove_suffix_result) {
-        return false;
-    }
+  $remove_suffix_result = remove_suffix($db);
+  if (!$remove_suffix_result) {
+    return FALSE;
+  }
 
-    // force reload cache
-    Configuration::loadConfiguration();
+  // force reload cache
+  Configuration::loadConfiguration();
 
-    // insert the new records for TAWKTO_SELECTED_WIDGET.
-    $insert_records_result = insert_records();
-    if (!$insert_records_result) {
-        return false;
-    }
+  // insert the new records for TAWKTO_SELECTED_WIDGET.
+  $insert_records_result = insert_records();
+  if (!$insert_records_result) {
+    return FALSE;
+  }
 
-    // delete records for TAWKTO_WIDGET_PAGE_ID & TAWKTO_WIDGET_WIDGET_ID
-    $remove_extras_result = remove_extras();
-    if (!$remove_extras_result) {
-        return false;
-    }
+  // delete records for TAWKTO_WIDGET_PAGE_ID & TAWKTO_WIDGET_WIDGET_ID
+  $remove_extras_result = remove_extras();
+  if (!$remove_extras_result) {
+    return FALSE;
+  }
 
-    return true;
+  return TRUE;
 }
 
-function remove_suffix($db)
-{
-    $keys = array(
-        TawkTo::TAWKTO_WIDGET_PAGE_ID,
-        TawkTo::TAWKTO_WIDGET_WIDGET_ID,
-        TawkTo::TAWKTO_WIDGET_OPTS,
-        TawkTo::TAWKTO_WIDGET_USER
-    );
+/**
+ * Remove the suffix first on the config key names.
+ *
+ * @param mixed $db Database instance.
+ * @return boolean
+ */
+function remove_suffix(mixed $db) {
+  $keys = [
+    TawkTo::TAWKTO_WIDGET_PAGE_ID,
+    TawkTo::TAWKTO_WIDGET_WIDGET_ID,
+    TawkTo::TAWKTO_WIDGET_OPTS,
+    TawkTo::TAWKTO_WIDGET_USER,
+  ];
 
-    // start building the update sql statement
-    $sql = array(
-        'UPDATE '._DB_PREFIX_.bqSQL(Configuration::$definition['table']).' conf',
-        'SET conf.name = CASE'
-    );
+  // start building the update sql statement
+  $sql = [
+    'UPDATE ' . _DB_PREFIX_ . bqSQL(Configuration::$definition['table']) . ' conf',
+    'SET conf.name = CASE',
+  ];
 
-    // build case when clause
-    foreach ($keys as $key) {
-        array_push($sql, "WHEN conf.name LIKE '".pSQL($key)."%' THEN '".pSQL($key)."'");
-    }
+  // build case when clause
+  foreach ($keys as $key) {
+    array_push($sql, "WHEN conf.name LIKE '" . pSQL($key) . "%' THEN '" . pSQL($key) . "'");
+  }
 
-    // build else and end case clause and where clause
-    array_push(
+  // build else and end case clause and where clause
+  array_push(
         $sql,
         "ELSE conf.name",
         "END",
         "WHERE conf.name LIKE 'TAWKTO_WIDGET_%';"
     );
 
-    // join sql array and execute
-    $result = $db->execute(join(' ', $sql)); //returns boolean value
+  // join sql array and execute
+  $result = $db->execute(implode(' ', $sql)); //returns boolean value
 
-    return $result;
+  return $result;
 }
 
-function insert_records()
-{
-    $res = true;
+/**
+ * Insert records
+ *
+ * @return boolean
+ */
+function insert_records() {
+  $res = TRUE;
 
-    // modify global first
-    $res &= modify_widget();
+  // modify global first
+  $res &= modify_widget();
 
-    $shop_ids = Shop::getCompleteListOfShopsID();
+  $shop_ids = Shop::getCompleteListOfShopsID();
 
-    $updated_groups = array();
-    foreach ($shop_ids as $shop_id) {
-        $shop_group_id = (int)Shop::getGroupFromShop($shop_id);
+  $updated_groups = [];
+  foreach ($shop_ids as $shop_id) {
+    $shop_group_id = (int) Shop::getGroupFromShop($shop_id);
 
-        if (!in_array($shop_group_id, $updated_groups)) {
-            // update the group config
-            $res &= modify_widget($shop_group_id);
-            $updated_groups[] = $shop_group_id;
-        }
-
-        // update the shop config
-        $res &= modify_widget($shop_group_id, $shop_id);
+    if (!in_array($shop_group_id, $updated_groups)) {
+      // update the group config
+      $res &= modify_widget($shop_group_id);
+      $updated_groups[] = $shop_group_id;
     }
 
-    return $res;
+    // update the shop config
+    $res &= modify_widget($shop_group_id, $shop_id);
+  }
+
+  return $res;
 }
 
-function modify_widget($shop_group_id = null, $shop_id = null)
-{
-    if (isset($shop_id)) {
-        Shop::setContext(Shop::CONTEXT_SHOP, $shop_id);
-    } elseif (isset($shop_group_id)) {
-        Shop::setContext(Shop::CONTEXT_GROUP, $shop_group_id);
-    } else {
-        Shop::setContext(Shop::CONTEXT_ALL);
-    }
+/**
+ * Update widget settings
+ *
+ * @param null|integer $shop_group_id Shop group ID.
+ * @param null|integer $shop_id       Shop ID.
+ * @return boolean
+ */
+function modify_widget($shop_group_id = NULL, $shop_id = NULL) {
+  if (isset($shop_id)) {
+    Shop::setContext(Shop::CONTEXT_SHOP, $shop_id);
+  }
+  elseif (isset($shop_group_id)) {
+    Shop::setContext(Shop::CONTEXT_GROUP, $shop_group_id);
+  }
+  else {
+    Shop::setContext(Shop::CONTEXT_ALL);
+  }
 
-    $page_id = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID, null, $shop_group_id, $shop_id);
-    $widget_id = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID, null, $shop_group_id, $shop_id);
-    return Configuration::updateValue(
+  $page_id = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID, NULL, $shop_group_id, $shop_id);
+  $widget_id = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID, NULL, $shop_group_id, $shop_id);
+  return Configuration::updateValue(
         TawkTo::TAWKTO_SELECTED_WIDGET,
-        $page_id.':'.$widget_id,
-        false,
+        $page_id . ':' . $widget_id,
+        FALSE,
         $shop_group_id,
         $shop_id
     );
 }
 
-function remove_extras()
-{
-    // remove TAWKTO_WIDGET_PAGE_ID and TAWKTO_WIDGET_WIDGET_ID records
-    $res = Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_PAGE_ID);
-    $res &= Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_WIDGET_ID);
-    return $res;
+/**
+ * Remove TAWKTO_WIDGET_PAGE_ID and TAWKTO_WIDGET_WIDGET_ID records
+ *
+ * @return boolean
+ */
+function remove_extras() {
+  $res = Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_PAGE_ID);
+  $res &= Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_WIDGET_ID);
+  return $res;
 }
