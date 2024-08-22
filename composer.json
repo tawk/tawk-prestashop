@@ -13,6 +13,7 @@
     },
     "license": "AFL-3.0",
     "scripts": {
+        "post-install-cmd": "npm install",
         "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
         "lint:fix": "phpcbf -p -s -v .; err=$?; if [ $err -eq 1 ]; then exit 0; else exit $err; fi;",
         "auto-index": "composer run auto-index:1.6 && composer run auto-index:1.7",
