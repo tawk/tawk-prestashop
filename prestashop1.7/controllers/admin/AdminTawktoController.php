@@ -1,4 +1,5 @@
 <?php
+
 /**
  * tawk.to
  *
@@ -18,205 +19,253 @@
  */
 
 if (!defined('_PS_VERSION_')) {
-    exit;
+  exit;
 }
 
-class AdminTawktoController extends ModuleAdminController
-{
-    public function __construct()
-    {
-        $this->bootstrap = true;
-        $this->display = 'view';
+/**
+ * Admin settings controller
+ */
+class AdminTawktoController extends ModuleAdminController {
 
-        parent::__construct();
-        $this->meta_title = $this->l('tawk.to');
+  /**
+   * __construct
+   *
+   * @return void
+   */
+  public function __construct() {
+    $this->bootstrap = TRUE;
+    $this->display = 'view';
 
-        if (!$this->module->active) {
-            Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
-        }
+    parent::__construct();
+    $this->meta_title = $this->l('tawk.to');
+
+    if (!$this->module->active) {
+      Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
+    }
+  }
+
+  /**
+   * Set toolbar title
+   *
+   * @return void
+   */
+  public function initToolBarTitle() {
+    $this->toolbar_title[] = $this->l('tawk.to');
+    $this->toolbar_title[] = $this->l('Widget');
+  }
+
+  /**
+   * Set toolbar actions
+   *
+   * @return mixed
+   */
+  public function initToolbar() {
+    $r = parent::initToolbar();
+
+    if (isset($this->toolbar_btn)) {
+      unset($this->toolbar_btn['back']);
+    }
+    else {
+      unset($this->page_header_toolbar_btn['back']);
     }
 
-    public function initToolBarTitle()
-    {
-        $this->toolbar_title[] = $this->l('tawk.to');
-        $this->toolbar_title[] = $this->l('Widget');
+    return $r;
+  }
+
+  /**
+   * Render admin widget settings view
+   *
+   * @return string
+   */
+  public function renderView() {
+    // get current shopId
+    $shop = Context::getContext()->shop;
+    $domain = $shop->domain;
+
+    $optKey = TawkTo::TAWKTO_WIDGET_OPTS;
+
+    // returns 'false' if retrieved none.
+    $displayOpts = Configuration::get($optKey);
+    if (!$displayOpts) {
+      $displayOpts = NULL;
+    }
+    $displayOpts = Tools::jsonDecode($displayOpts);
+
+    $sameUser = TRUE; // assuming there is only one admin by default
+    $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
+    if ($this->context->employee->id != $empId && $empId) {
+      $sameUser = FALSE;
     }
 
-    public function initToolbar()
-    {
-        $r = parent::initToolbar();
-
-        if (isset($this->toolbar_btn)) {
-            unset($this->toolbar_btn['back']);
-        } else {
-            unset($this->page_header_toolbar_btn['back']);
-        }
-
-        return $r;
+    $currentWidget = TawkTo::getPropertyAndWidget();
+    $pageId = '';
+    $widgetId = '';
+    if (!empty($currentWidget)) {
+      $pageId = $currentWidget['page_id'];
+      $widgetId = $currentWidget['widget_id'];
     }
 
-    public function renderView()
-    {
-        // get current shopId
-        $shop = Context::getContext()->shop;
-        $domain = $shop->domain;
+    $this->tpl_view_vars = [
+      'iframe_url' => $this->getIframeUrl(),
+      'base_url' => $this->getBaseUrl(),
+      'controller' => $this->context->link->getAdminLink('AdminTawkto'),
+      'tab_id' => (int) $this->context->controller->id,
+      'domain' => $domain,
+      'display_opts' => $displayOpts,
+      'page_id' => $pageId,
+      'widget_id' => $widgetId,
+      'same_user' => $sameUser,
+    ];
 
-        $optKey = TawkTo::TAWKTO_WIDGET_OPTS;
+    return parent::renderView();
+  }
 
-        // returns 'false' if retrieved none.
-        $displayOpts = Configuration::get($optKey);
-        if (!$displayOpts) {
-            $displayOpts = null;
-        }
-        $displayOpts = Tools::jsonDecode($displayOpts);
+  /**
+   * Base plugin URL
+   *
+   * @return string
+   */
+  private function getBaseUrl() {
+    return 'https://plugins.tawk.to';
+  }
 
-        $sameUser = true; // assuming there is only one admin by default
-        $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
-        if ($this->context->employee->id != $empId && $empId) {
-            $sameUser = false;
-        }
-
-        $currentWidget = TawkTo::getPropertyAndWidget();
-        $pageId = '';
-        $widgetId = '';
-        if (!empty($currentWidget)) {
-            $pageId = $currentWidget['page_id'];
-            $widgetId = $currentWidget['widget_id'];
-        }
-
-        $this->tpl_view_vars = array(
-            'iframe_url' => $this->getIframeUrl(),
-            'base_url' => $this->getBaseUrl(),
-            'controller' => $this->context->link->getAdminLink('AdminTawkto'),
-            'tab_id' => (int) $this->context->controller->id,
-            'domain' => $domain,
-            'display_opts' => $displayOpts,
-            'page_id' => $pageId,
-            'widget_id' => $widgetId,
-            'same_user' => $sameUser
-        );
-
-        return parent::renderView();
+  /**
+   * Generates iframe URL
+   *
+   * @return string
+   */
+  private function getIframeUrl() {
+    $currentWidget = TawkTo::getPropertyAndWidget();
+    $pageId = '';
+    $widgetId = '';
+    if (!empty($currentWidget)) {
+      $pageId = $currentWidget['page_id'];
+      $widgetId = $currentWidget['widget_id'];
     }
 
-    private function getBaseUrl()
-    {
-        return 'https://plugins.tawk.to';
+    return $this->getBaseUrl()
+            . '/generic/widgets?currentPageId=' . $pageId
+            . '&currentWidgetId=' . $widgetId;
+  }
+
+  /**
+   * Validate page ID and widget ID
+   *
+   * @param string $pageId   Page ID.
+   * @param string $widgetId Widget ID.
+   * @return integer|false
+   */
+  private static function idsAreCorrect(string $pageId, string $widgetId) {
+    return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
+  }
+
+  /**
+   * Save widget page ID and widget ID
+   *
+   * @return void
+   */
+  public function ajaxProcessSetWidget() {
+    if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
+      die(Tools::jsonEncode(['success' => FALSE]));
     }
 
-    private function getIframeUrl()
-    {
-        $currentWidget = TawkTo::getPropertyAndWidget();
-        $pageId = '';
-        $widgetId = '';
-        if (!empty($currentWidget)) {
-            $pageId = $currentWidget['page_id'];
-            $widgetId = $currentWidget['widget_id'];
-        }
-
-        return $this->getBaseUrl()
-            .'/generic/widgets'
-            .'?currentPageId='.$pageId
-            .'&currentWidgetId='.$widgetId;
+    $pageId = Tools::getValue('pageId');
+    $widgetId = Tools::getValue('widgetId');
+    if (!self::idsAreCorrect($pageId, $widgetId)) {
+      die(Tools::jsonEncode(['success' => FALSE]));
     }
 
-    private static function idsAreCorrect($pageId, $widgetId)
-    {
-        return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
+    $currentWidgetKey = TawkTo::TAWKTO_SELECTED_WIDGET;
+    Configuration::updateValue($currentWidgetKey, $pageId . ':' . $widgetId);
+
+    $userKey = TawkTo::TAWKTO_WIDGET_USER;
+    Configuration::updateValue($userKey, $this->context->employee->id);
+
+    die(Tools::jsonEncode(['success' => TRUE]));
+  }
+
+  /**
+   * Remove widget page ID and widget ID
+   *
+   * @return void
+   */
+  public function ajaxProcessRemoveWidget() {
+    $keys = [
+      TawkTo::TAWKTO_SELECTED_WIDGET,
+      TawkTo::TAWKTO_WIDGET_USER,
+    ];
+
+    foreach ($keys as $key) {
+      if (Shop::getContext() == Shop::CONTEXT_ALL) {
+        Configuration::updateValue($key, '');
+      }
+      else {
+        // Configuration::deleteFromContext method cannot be used by
+        // 'All Shops' or the current shop context is 'CONTEXT_ALL'.
+        Configuration::deleteFromContext($key);
+      }
     }
 
-    public function ajaxProcessSetWidget()
-    {
-        if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
-            die(Tools::jsonEncode(array('success' => false)));
-        }
+    die(Tools::jsonEncode(['success' => TRUE]));
+  }
 
-        $pageId = Tools::getValue('pageId');
-        $widgetId = Tools::getValue('widgetId');
-        if (!self::idsAreCorrect($pageId, $widgetId)) {
-            die(Tools::jsonEncode(array('success' => false)));
-        }
+  /**
+   * Save visibility settings
+   *
+   * @return void
+   */
+  public function ajaxProcessSetVisibility() {
+    $jsonOpts = [
+      'always_display' => FALSE,
 
-        $currentWidgetKey = TawkTo::TAWKTO_SELECTED_WIDGET;
-        Configuration::updateValue($currentWidgetKey, $pageId.':'.$widgetId);
+          // default value needs to be a json encoded of an empty array
+          // since we're going to save a json encoded array later on.
+      'hide_oncustom' => json_encode([]),
 
-        $userKey = TawkTo::TAWKTO_WIDGET_USER;
-        Configuration::updateValue($userKey, $this->context->employee->id);
+      'show_onfrontpage' => FALSE,
+      'show_oncategory' => FALSE,
+      'show_onproduct' => FALSE,
 
-        die(Tools::jsonEncode(array('success' => true)));
-    }
+          // default value needs to be a json encoded of an empty array
+          // since we're going to save a json encoded array later on.
+      'show_oncustom' => json_encode([]),
 
-    public function ajaxProcessRemoveWidget()
-    {
-        $keys = array(
-            TawkTo::TAWKTO_SELECTED_WIDGET,
-            TawkTo::TAWKTO_WIDGET_USER
-        );
+      'enable_visitor_recognition' => FALSE,
+    ];
 
-        foreach ($keys as $key) {
-            if (Shop::getContext() == Shop::CONTEXT_ALL) {
-                Configuration::updateValue($key, '');
-            } else {
-                // Configuration::deleteFromContext method cannot be used by
-                // 'All Shops' or the current shop context is 'CONTEXT_ALL'.
-                Configuration::deleteFromContext($key);
+    $options = Tools::getValue('options');
+    if (!empty($options)) {
+      $options = explode('&', $options);
+      foreach ($options as $post) {
+        [$column, $value] = explode('=', $post);
+        switch ($column) {
+          case 'hide_oncustom':
+          case 'show_oncustom':
+            // replace newlines and returns with comma, and convert to array for
+            // saving
+            $value = urldecode($value);
+            $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
+            if (!empty($value)) {
+              $value = explode(",", $value);
+              $jsonOpts[$column] = json_encode($value);
             }
-        }
+            break;
 
-        die(Tools::jsonEncode(array('success' => true)));
+          case 'show_onfrontpage':
+          case 'show_oncategory':
+          case 'show_onproduct':
+          case 'always_display':
+          case 'enable_visitor_recognition':
+            $jsonOpts[$column] = ($value == 1);
+            break;
+        }
+      }
     }
 
+    $key = TawkTo::TAWKTO_WIDGET_OPTS;
+    Configuration::updateValue($key, json_encode($jsonOpts));
 
-    public function ajaxProcessSetVisibility()
-    {
-        $jsonOpts = array(
-            'always_display' => false,
+    die(Tools::jsonEncode(['success' => TRUE]));
+  }
 
-            // default value needs to be a json encoded of an empty array
-            // since we're going to save a json encoded array later on.
-            'hide_oncustom' => json_encode(array()),
-
-            'show_onfrontpage' => false,
-            'show_oncategory' => false,
-            'show_onproduct' => false,
-
-            // default value needs to be a json encoded of an empty array
-            // since we're going to save a json encoded array later on.
-            'show_oncustom' => json_encode(array()),
-
-            'enable_visitor_recognition' => false
-        );
-
-        $options = Tools::getValue('options');
-        if (!empty($options)) {
-            $options = explode('&', $options);
-            foreach ($options as $post) {
-                list($column, $value) = explode('=', $post);
-                switch ($column) {
-                    case 'hide_oncustom':
-                    case 'show_oncustom':
-                        // replace newlines and returns with comma, and convert to array for saving
-                        $value = urldecode($value);
-                        $value = str_ireplace(array("\r\n", "\r", "\n"), ',', $value);
-                        if (!empty($value)) {
-                            $value = explode(",", $value);
-                            $jsonOpts[$column] = json_encode($value);
-                        }
-                        break;
-                    case 'show_onfrontpage':
-                    case 'show_oncategory':
-                    case 'show_onproduct':
-                    case 'always_display':
-                    case 'enable_visitor_recognition':
-                        $jsonOpts[$column] = ($value == 1);
-                        break;
-                }
-            }
-        }
-
-        $key = TawkTo::TAWKTO_WIDGET_OPTS;
-        Configuration::updateValue($key, json_encode($jsonOpts));
-
-        die(Tools::jsonEncode(array('success' => true)));
-    }
 }

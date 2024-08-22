@@ -1,3 +1,5 @@
 *.zip
 ./build/tawkto
 **/vendor
+.phpcs.cache
+node_modules/

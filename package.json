@@ -1,0 +1,24 @@
+{
+  "name": "tawk-prestashop",
+  "version": "1.0.0",
+  "description": "Free live chat widget for your site",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tawk/tawk-prestashop.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tawk/tawk-prestashop/issues"
+  },
+  "homepage": "https://github.com/tawk/tawk-prestashop#readme",
+  "devDependencies": {
+    "husky": "^9.1.5",
+    "lint-staged": "^15.2.9"
+  }
+}

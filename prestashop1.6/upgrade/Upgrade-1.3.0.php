@@ -1,4 +1,5 @@
 <?php
+
 /**
 * tawk.to
 *
@@ -18,166 +19,201 @@
 */
 
 if (!defined('_PS_VERSION_')) {
-    exit;
+  exit;
 }
 
 require_once _PS_MODULE_DIR_ . 'tawkto/vendor/autoload.php';
 
 use Tawk\Helpers\PathHelper;
 
-function upgrade_module_1_3_0()
-{
-    // update the records for TAWKTO_WIDGET_OPTS.
-    $update_records_result = update_records();
-    if (!$update_records_result) {
-        return false;
-    }
+/**
+ * Upgrade entry point
+ *
+ * @return boolean
+ */
+function upgrade_module_1_3_0() {
+  // update the records for TAWKTO_WIDGET_OPTS.
+  $update_records_result = update_records();
+  if (!$update_records_result) {
+    return FALSE;
+  }
 
-    return true;
+  return TRUE;
 }
 
-function update_records()
-{
-    $res = true;
+/**
+ * Update records
+ *
+ * @return boolean
+ */
+function update_records() {
+  $res = TRUE;
 
-    // modify global first
-    $res &= update_visibility_opts();
+  // modify global first
+  $res &= update_visibility_opts();
 
-    $shop_ids = Shop::getCompleteListOfShopsID();
+  $shop_ids = Shop::getCompleteListOfShopsID();
 
-    $updated_groups = array();
-    foreach ($shop_ids as $shop_id) {
-        $shop_group_id = (int)Shop::getGroupFromShop($shop_id);
+  $updated_groups = [];
+  foreach ($shop_ids as $shop_id) {
+    $shop_group_id = (int) Shop::getGroupFromShop($shop_id);
 
-        if (!in_array($shop_group_id, $updated_groups)) {
-            // update the group config
-            $res &= update_visibility_opts($shop_group_id);
-            $updated_groups[] = $shop_group_id;
-        }
-
-        // update the shop config
-        $res &= update_visibility_opts($shop_group_id, $shop_id);
+    if (!in_array($shop_group_id, $updated_groups)) {
+      // update the group config
+      $res &= update_visibility_opts($shop_group_id);
+      $updated_groups[] = $shop_group_id;
     }
 
-    return $res;
+    // update the shop config
+    $res &= update_visibility_opts($shop_group_id, $shop_id);
+  }
+
+  return $res;
 }
 
-function update_visibility_opts($shop_group_id = null, $shop_id = null)
-{
-    if (isset($shop_id)) {
-        Shop::setContext(Shop::CONTEXT_SHOP, $shop_id);
-    } elseif (isset($shop_group_id)) {
-        Shop::setContext(Shop::CONTEXT_GROUP, $shop_group_id);
-    } else {
-        Shop::setContext(Shop::CONTEXT_ALL);
+/**
+ * Update visibility options
+ *
+ * @param null|integer $shop_group_id Shop group ID.
+ * @param null|integer $shop_id       Shop ID.
+ * @return boolean
+ */
+function update_visibility_opts($shop_group_id = NULL, $shop_id = NULL) {
+  if (isset($shop_id)) {
+    Shop::setContext(Shop::CONTEXT_SHOP, $shop_id);
+  }
+  elseif (isset($shop_group_id)) {
+    Shop::setContext(Shop::CONTEXT_GROUP, $shop_group_id);
+  }
+  else {
+    Shop::setContext(Shop::CONTEXT_ALL);
+  }
+
+  $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS, NULL, $shop_group_id, $shop_id);
+
+  if (!$opts) {
+    return FALSE;
+  }
+
+  $opts = json_decode($opts);
+
+  if (isset($opts->show_oncustom)) {
+    $show_oncustom = json_decode($opts->show_oncustom);
+    if (is_array($show_oncustom)) {
+      $opts->show_oncustom = add_wildcard_to_pattern_list($show_oncustom);
     }
+  }
 
-    $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS, null, $shop_group_id, $shop_id);
-
-    if (!$opts) {
-        return false;
+  if (isset($opts->hide_oncustom)) {
+    $hide_oncustom = json_decode($opts->hide_oncustom);
+    if (is_array($hide_oncustom)) {
+      $opts->hide_oncustom = add_wildcard_to_pattern_list($hide_oncustom);
     }
+  }
 
-    $opts = json_decode($opts);
-
-    if (isset($opts->show_oncustom)) {
-        $show_oncustom = json_decode($opts->show_oncustom);
-        if (is_array($show_oncustom)) {
-            $opts->show_oncustom = addWildcardToPatternList($show_oncustom);
-        }
-    }
-
-    if (isset($opts->hide_oncustom)) {
-        $hide_oncustom = json_decode($opts->hide_oncustom);
-        if (is_array($hide_oncustom)) {
-            $opts->hide_oncustom = addWildcardToPatternList($hide_oncustom);
-        }
-    }
-
-    return Configuration::updateValue(
+  return Configuration::updateValue(
         TawkTo::TAWKTO_WIDGET_OPTS,
         json_encode($opts),
-        false,
+        FALSE,
         $shop_group_id,
         $shop_id
     );
 }
 
-function checkPatternListHasWildcard($patternList, $wildcard) {
-    foreach ($patternList as $pattern) {
-        if (strpos($pattern, $wildcard) > -1) {
-            return true;
-        }
+/**
+ * Check pattern list for wildcard
+ *
+ * @param string[] $patternList List of patterns.
+ * @param string   $wildcard    Wildcard.
+ * @return boolean
+ */
+function check_pattern_list_has_wildcard(array $patternList, string $wildcard) {
+  foreach ($patternList as $pattern) {
+    if (strpos($pattern, $wildcard) > -1) {
+      return TRUE;
     }
+  }
 
-    return false;
+  return FALSE;
 }
 
-function addWildcardToPatternList($patternList)
-{
-    $wildcard = PathHelper::get_wildcard();
+/**
+ * Add wildcard to pattern list
+ *
+ * @param string[] $patternList List of patterns.
+ * @return string|false
+ */
+function add_wildcard_to_pattern_list(array $patternList) {
+  $wildcard = PathHelper::get_wildcard();
 
-    if (checkPatternListHasWildcard($patternList, $wildcard)) {
-        return json_encode($patternList);
+  if (check_pattern_list_has_wildcard($patternList, $wildcard)) {
+    return json_encode($patternList);
+  }
+
+  $newPatternList = [];
+  $addedPatterns = [];
+
+  foreach ($patternList as $pattern) {
+    if (empty($pattern)) {
+      continue;
     }
 
-    $newPatternList = [];
-    $addedPatterns = [];
+    $pattern = ltrim($pattern, PHP_EOL);
+    $pattern = trim($pattern);
 
-    foreach ($patternList as $pattern) {
-        if (empty($pattern)) {
-            continue;
-        }
+    if (strpos($pattern, 'http://') !== 0 &&
+          strpos($pattern, 'https://') !== 0 &&
+          strpos($pattern, '/') !== 0
+      ) {
+      // Check if the first part of the string is a host.
+      // If not, add a leading / so that the pattern
+      // matcher treats is as a path.
+      $firstPatternChunk = explode('/', $pattern)[0];
 
-        $pattern = ltrim($pattern, PHP_EOL);
-        $pattern = trim($pattern);
-
-        if (strpos($pattern, 'http://') !== 0 &&
-            strpos($pattern, 'https://') !== 0 &&
-            strpos($pattern, '/') !== 0
-        ) {
-            // Check if the first part of the string is a host.
-            // If not, add a leading / so that the pattern
-            // matcher treats is as a path.
-            $firstPatternChunk = explode('/', $pattern)[0];
-
-            if (checkValidHost($firstPatternChunk) === false) {
-                $pattern = '/' . $pattern;
-            }
-        }
-
-        $newPatternList[] = $pattern;
-        $newPattern = $pattern . '/' . $wildcard;
-        if (in_array($newPattern, $patternList, true)) {
-            continue;
-        }
-
-        if (true === isset($addedPatterns[$newPattern])) {
-            continue;
-        }
-
-        $newPatternList[] = $newPattern;
-        $addedPatterns[$newPattern] = true;
+      if (check_valid_host($firstPatternChunk) === FALSE) {
+        $pattern = '/' . $pattern;
+      }
     }
 
-    // EOL for display purposes
-    return json_encode($newPatternList);
+    $newPatternList[] = $pattern;
+    $newPattern = $pattern . '/' . $wildcard;
+    if (in_array($newPattern, $patternList, TRUE)) {
+      continue;
+    }
+
+    if (TRUE === isset($addedPatterns[$newPattern])) {
+      continue;
+    }
+
+    $newPatternList[] = $newPattern;
+    $addedPatterns[$newPattern] = TRUE;
+  }
+
+  // EOL for display purposes
+  return json_encode($newPatternList);
 }
 
-function checkValidHost($host) {
-    // contains port
-    if (strpos($host, ':') < 0) {
-        return true;
-    }
+/**
+ * Check if is hostname
+ *
+ * @param string $host Hostname.
+ * @return boolean
+ */
+function check_valid_host(string $host) {
+  // contains port
+  if (strpos($host, ':') < 0) {
+    return TRUE;
+  }
 
-    // is localhost
-    if (strpos($host, 'localhost') === 0) {
-        return true;
-    }
+  // is localhost
+  if (strpos($host, 'localhost') === 0) {
+    return TRUE;
+  }
 
-    // gotten from https://forums.digitalpoint.com/threads/what-will-be-preg_match-for-domain-names.1953314/#post-15036873
-    // but updated the ending regex part to include numbers so it also matches IPs.
-    $host_check_regex = '/^[a-zA-Z0-9]*((-|\.)?[a-zA-Z0-9])*\.([a-zA-Z0-9]{1,4})$/';
+  // gotten from https://forums.digitalpoint.com/threads/what-will-be-preg_match-for-domain-names.1953314/#post-15036873
+  // but updated the ending regex part to include numbers so it also matches
+  // IPs.
+  $host_check_regex = '/^[a-zA-Z0-9]*((-|\.)?[a-zA-Z0-9])*\.([a-zA-Z0-9]{1,4})$/';
 
-    return preg_match($host_check_regex, $host) > 0;
+  return preg_match($host_check_regex, $host) > 0;
 }
