@@ -10,13 +10,8 @@
 	<arg value="ps"/>
 	<arg name="colors"/>
 	<arg name="parallel" value="100"/>
-	<arg name="extensions" value="php,md"/>
+	<arg name="extensions" value="php"/>
 	<arg name="cache" value=".phpcs.cache"/>
-
-	<rule ref="Drupal">
-		<exclude name="Drupal.Classes.ClassFileName.NoMatch"/>
-		<exclude name="Drupal.Commenting"/>
-	</rule>
 
 	<rule ref="Squiz.Commenting.FunctionComment" />
 	<rule ref="Squiz.Commenting.FunctionCommentThrowTag" />
