@@ -3,3 +3,4 @@
 **/vendor
 .phpcs.cache
 node_modules/
+.php_cs_fixer.cache
