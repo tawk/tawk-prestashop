@@ -20,6 +20,10 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once _PS_MODULE_DIR_ . 'tawkto/vendor/autoload.php';
+
+use Tawk\Modules\UrlPatternMatcher;
+
 /**
  * tawk.to module
  */
@@ -120,58 +124,44 @@ class Tawkto extends Module
                 $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                foreach ($show_pages as $slug) {
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(['http://', 'https://'], '', $slug);
-                        if (stripos($current_page, $slug) !== false) {
+                if (UrlPatternMatcher::match($current_page, $show_pages)) {
+                    $show = true;
+                }
+
+                if (!$show) {
+                    if ('product' == $this->context->controller->php_self) {
+                        if ($options->show_onproduct) {
                             $show = true;
-                            break;
+                        }
+                    }
+
+                    if ('category' == $this->context->controller->php_self) {
+                        if ($options->show_oncategory) {
+                            $show = true;
+                        }
+                    }
+
+                    if ('index' == $this->context->controller->php_self) {
+                        if ($options->show_onfrontpage) {
+                            $show = true;
                         }
                     }
                 }
 
                 if (!$show) {
-                    if ('product' == $this->context->controller->php_self) {
-                        if (false == $options->show_onproduct) {
-                            return;
-                        }
-                    }
-
-                    if ('category' == $this->context->controller->php_self) {
-                        if (false == $options->show_oncategory) {
-                            return;
-                        }
-                    }
-
-                    if ('index' == $this->context->controller->php_self) {
-                        if (false == $options->show_onfrontpage) {
-                            return;
-                        }
-                    }
-                }
-
-                if (!$show && !in_array($this->context->controller->php_self, ['index', 'category', 'product'])) {
-                    return;
+                    return '';
                 }
             } else {
                 // hide on specified urls
                 $hide_pages = $this->getArrayFromJson($options->hide_oncustom);
 
                 $show = true;
-                foreach ($hide_pages as $slug) {
-                    // we need to add htmlspecialchars due to slashes added when saving to database
-                    $slug = (string) htmlspecialchars($slug);
-                    if (!empty($slug)) {
-                        $slug = str_ireplace(['http://', 'https://'], '', $slug);
-                        if (stripos($current_page, $slug) !== false) {
-                            $show = false;
-                            break;
-                        }
-                    }
+                if (UrlPatternMatcher::match($current_page, $hide_pages)) {
+                    $show = false;
                 }
 
                 if (!$show) {
-                    return;
+                    return '';
                 }
             }
         }
