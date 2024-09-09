@@ -16,13 +16,20 @@
  * @copyright Copyright (c) 2014-2021 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Admin settings controller
+ */
 class AdminTawktoController extends ModuleAdminController
 {
+    /**
+     * __construct
+     *
+     * @return void
+     */
     public function __construct()
     {
         $this->bootstrap = true;
@@ -36,12 +43,22 @@ class AdminTawktoController extends ModuleAdminController
         }
     }
 
+    /**
+     * Set toolbar title
+     *
+     * @return void
+     */
     public function initToolBarTitle()
     {
         $this->toolbar_title[] = $this->l('tawk.to');
         $this->toolbar_title[] = $this->l('Widget');
     }
 
+    /**
+     * Set toolbar actions
+     *
+     * @return mixed
+     */
     public function initToolbar()
     {
         $r = parent::initToolbar();
@@ -55,6 +72,11 @@ class AdminTawktoController extends ModuleAdminController
         return $r;
     }
 
+    /**
+     * Render admin widget settings view
+     *
+     * @return string
+     */
     public function renderView()
     {
         // get current shopId
@@ -84,7 +106,7 @@ class AdminTawktoController extends ModuleAdminController
             $widgetId = $currentWidget['widget_id'];
         }
 
-        $this->tpl_view_vars = array(
+        $this->tpl_view_vars = [
             'iframe_url' => $this->getIframeUrl(),
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
@@ -93,17 +115,27 @@ class AdminTawktoController extends ModuleAdminController
             'display_opts' => $displayOpts,
             'page_id' => $pageId,
             'widget_id' => $widgetId,
-            'same_user' => $sameUser
-        );
+            'same_user' => $sameUser,
+        ];
 
         return parent::renderView();
     }
 
+    /**
+     * Base plugin URL
+     *
+     * @return string
+     */
     private function getBaseUrl()
     {
         return 'https://plugins.tawk.to';
     }
 
+    /**
+     * Generates iframe URL
+     *
+     * @return string
+     */
     private function getIframeUrl()
     {
         $currentWidget = TawkTo::getPropertyAndWidget();
@@ -115,43 +147,61 @@ class AdminTawktoController extends ModuleAdminController
         }
 
         return $this->getBaseUrl()
-            .'/generic/widgets'
-            .'?currentPageId='.$pageId
-            .'&currentWidgetId='.$widgetId;
+            . '/generic/widgets'
+            . '?currentPageId=' . $pageId
+            . '&currentWidgetId=' . $widgetId;
     }
 
-    private static function idsAreCorrect($pageId, $widgetId)
+    /**
+     * Validate page ID and widget ID
+     *
+     * @param string $pageId page ID
+     * @param string $widgetId widget ID
+     *
+     * @return int|false
+     */
+    private static function idsAreCorrect(string $pageId, string $widgetId)
     {
         return preg_match('/^[0-9A-Fa-f]{24}$/', $pageId) === 1 && preg_match('/^[a-z0-9]{1,50}$/i', $widgetId) === 1;
     }
 
+    /**
+     * Save widget page ID and widget ID
+     *
+     * @return void
+     */
     public function ajaxProcessSetWidget()
     {
         if (!Tools::getIsset('pageId') || !Tools::getIsset('widgetId')) {
-            die(json_encode(array('success' => false)));
+            die(json_encode(['success' => false]));
         }
 
         $pageId = Tools::getValue('pageId');
         $widgetId = Tools::getValue('widgetId');
         if (!self::idsAreCorrect($pageId, $widgetId)) {
-            die(json_encode(array('success' => false)));
+            die(json_encode(['success' => false]));
         }
 
         $currentWidgetKey = TawkTo::TAWKTO_SELECTED_WIDGET;
-        Configuration::updateValue($currentWidgetKey, $pageId.':'.$widgetId);
+        Configuration::updateValue($currentWidgetKey, $pageId . ':' . $widgetId);
 
         $userKey = TawkTo::TAWKTO_WIDGET_USER;
         Configuration::updateValue($userKey, $this->context->employee->id);
 
-        die(json_encode(array('success' => true)));
+        die(json_encode(['success' => true]));
     }
 
+    /**
+     * Remove widget page ID and widget ID
+     *
+     * @return void
+     */
     public function ajaxProcessRemoveWidget()
     {
-        $keys = array(
+        $keys = [
             TawkTo::TAWKTO_SELECTED_WIDGET,
-            TawkTo::TAWKTO_WIDGET_USER
-        );
+            TawkTo::TAWKTO_WIDGET_USER,
+        ];
 
         foreach ($keys as $key) {
             if (Shop::getContext() == Shop::CONTEXT_ALL) {
@@ -163,18 +213,22 @@ class AdminTawktoController extends ModuleAdminController
             }
         }
 
-        die(json_encode(array('success' => true)));
+        die(json_encode(['success' => true]));
     }
 
-
+    /**
+     * Save visibility settings
+     *
+     * @return void
+     */
     public function ajaxProcessSetVisibility()
     {
-        $jsonOpts = array(
+        $jsonOpts = [
             'always_display' => false,
 
             // default value needs to be a json encoded of an empty array
             // since we're going to save a json encoded array later on.
-            'hide_oncustom' => json_encode(array()),
+            'hide_oncustom' => json_encode([]),
 
             'show_onfrontpage' => false,
             'show_oncategory' => false,
@@ -182,10 +236,10 @@ class AdminTawktoController extends ModuleAdminController
 
             // default value needs to be a json encoded of an empty array
             // since we're going to save a json encoded array later on.
-            'show_oncustom' => json_encode(array()),
+            'show_oncustom' => json_encode([]),
 
-            'enable_visitor_recognition' => false
-        );
+            'enable_visitor_recognition' => false,
+        ];
 
         $options = Tools::getValue('options');
         if (!empty($options)) {
@@ -197,9 +251,9 @@ class AdminTawktoController extends ModuleAdminController
                     case 'show_oncustom':
                         // replace newlines and returns with comma, and convert to array for saving
                         $value = urldecode($value);
-                        $value = str_ireplace(array("\r\n", "\r", "\n"), ',', $value);
+                        $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
                         if (!empty($value)) {
-                            $value = explode(",", $value);
+                            $value = explode(',', $value);
                             $jsonOpts[$column] = json_encode($value);
                         }
                         break;
@@ -217,6 +271,6 @@ class AdminTawktoController extends ModuleAdminController
         $key = TawkTo::TAWKTO_WIDGET_OPTS;
         Configuration::updateValue($key, json_encode($jsonOpts));
 
-        die(json_encode(array('success' => true)));
+        die(json_encode(['success' => true]));
     }
 }
