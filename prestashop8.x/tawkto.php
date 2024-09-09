@@ -43,7 +43,7 @@ class Tawkto extends Module
         $this->version = '1.2.3';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '8.1.6'];
+        $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '8.1.99'];
 
         parent::__construct();
 
