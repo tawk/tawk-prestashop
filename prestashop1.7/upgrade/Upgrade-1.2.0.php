@@ -1,4 +1,5 @@
 <?php
+
 /**
  * tawk.to
  *
@@ -13,19 +14,22 @@
  * to support@tawk.to so we can send you a copy immediately.
  *
  * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2021 tawk.to
+ * @copyright Copyright (c) 2014-2022 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * Upgrade entry point
+ *
+ * @return bool
+ */
 function upgrade_module_1_2_0()
 {
     $db = Db::getInstance();
 
-    // remove the suffix first on the config key names.
     $remove_suffix_result = remove_suffix($db);
     if (!$remove_suffix_result) {
         return false;
@@ -49,40 +53,52 @@ function upgrade_module_1_2_0()
     return true;
 }
 
-function remove_suffix($db)
+/**
+ * Remove the suffix first on the config key names.
+ *
+ * @param mixed $db database instance
+ *
+ * @return bool
+ */
+function remove_suffix(mixed $db)
 {
-    $keys = array(
+    $keys = [
         TawkTo::TAWKTO_WIDGET_PAGE_ID,
         TawkTo::TAWKTO_WIDGET_WIDGET_ID,
         TawkTo::TAWKTO_WIDGET_OPTS,
-        TawkTo::TAWKTO_WIDGET_USER
-    );
+        TawkTo::TAWKTO_WIDGET_USER,
+    ];
 
     // start building the update sql statement
-    $sql = array(
-        'UPDATE '._DB_PREFIX_.bqSQL(Configuration::$definition['table']).' conf',
-        'SET conf.name = CASE'
-    );
+    $sql = [
+        'UPDATE ' . _DB_PREFIX_ . bqSQL(Configuration::$definition['table']) . ' conf',
+        'SET conf.name = CASE',
+    ];
 
     // build case when clause
     foreach ($keys as $key) {
-        array_push($sql, "WHEN conf.name LIKE '".pSQL($key)."%' THEN '".pSQL($key)."'");
+        array_push($sql, "WHEN conf.name LIKE '" . pSQL($key) . "%' THEN '" . pSQL($key) . "'");
     }
 
     // build else and end case clause and where clause
     array_push(
         $sql,
-        "ELSE conf.name",
-        "END",
+        'ELSE conf.name',
+        'END',
         "WHERE conf.name LIKE 'TAWKTO_WIDGET_%';"
     );
 
     // join sql array and execute
-    $result = $db->execute(join(' ', $sql)); //returns boolean value
+    $result = $db->execute(implode(' ', $sql)); // returns boolean value
 
     return $result;
 }
 
+/**
+ * Insert records
+ *
+ * @return bool
+ */
 function insert_records()
 {
     $res = true;
@@ -92,9 +108,9 @@ function insert_records()
 
     $shop_ids = Shop::getCompleteListOfShopsID();
 
-    $updated_groups = array();
+    $updated_groups = [];
     foreach ($shop_ids as $shop_id) {
-        $shop_group_id = (int)Shop::getGroupFromShop($shop_id);
+        $shop_group_id = (int) Shop::getGroupFromShop($shop_id);
 
         if (!in_array($shop_group_id, $updated_groups)) {
             // update the group config
@@ -109,6 +125,14 @@ function insert_records()
     return $res;
 }
 
+/**
+ * Update widget settings
+ *
+ * @param int|null $shop_group_id shop group ID
+ * @param int|null $shop_id shop ID
+ *
+ * @return bool
+ */
 function modify_widget($shop_group_id = null, $shop_id = null)
 {
     if (isset($shop_id)) {
@@ -121,19 +145,25 @@ function modify_widget($shop_group_id = null, $shop_id = null)
 
     $page_id = Configuration::get(TawkTo::TAWKTO_WIDGET_PAGE_ID, null, $shop_group_id, $shop_id);
     $widget_id = Configuration::get(TawkTo::TAWKTO_WIDGET_WIDGET_ID, null, $shop_group_id, $shop_id);
+
     return Configuration::updateValue(
         TawkTo::TAWKTO_SELECTED_WIDGET,
-        $page_id.':'.$widget_id,
+        $page_id . ':' . $widget_id,
         false,
         $shop_group_id,
         $shop_id
     );
 }
 
+/**
+ * Remove TAWKTO_WIDGET_PAGE_ID and TAWKTO_WIDGET_WIDGET_ID records
+ *
+ * @return bool
+ */
 function remove_extras()
 {
-    // remove TAWKTO_WIDGET_PAGE_ID and TAWKTO_WIDGET_WIDGET_ID records
     $res = Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_PAGE_ID);
     $res &= Configuration::deleteByName(TawkTo::TAWKTO_WIDGET_WIDGET_ID);
+
     return $res;
 }

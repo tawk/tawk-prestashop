@@ -1,0 +1,67 @@
+name: create-release-artifact
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: cached dependencies
+        uses: actions/cache@v2
+        id: cached-dependencies
+        with:
+          path: |
+            ./vendor
+            ./prestashop1.6/vendor
+            ./prestashop1.7/vendor
+          # the key will change if composer.lock changes
+          key: ${{ runner.os }}-dependencies-${{ hashFiles('**/composer.lock') }}
+
+      - name: install dependencies
+        uses: php-actions/composer@v6
+        with:
+          command: run build
+
+  create-release-artifact:
+    needs: [build]
+    name: Creating release artifact
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ps_version: ['1.6', '1.7']
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: cached dependencies
+        uses: actions/cache@v2
+        id: cached-dependencies
+        with:
+          path: |
+            ./vendor
+            ./prestashop1.6/vendor
+            ./prestashop1.7/vendor
+          # the key will change if composer.lock changes
+          key: ${{ runner.os }}-dependencies-${{ hashFiles('**/composer.lock') }}
+
+      - name: build artifact
+        run: composer run auto-index && ./build/build-package.sh
+
+      - name: set version for prestashop ${{ matrix.ps_version }}
+        id: version
+        run: echo "::set-output name=version::$(awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' ./prestashop${{ matrix.ps_version }}/config.xml | xargs)"
+
+      - name: upload prestashop ${{ matrix.ps_version }} artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./build/tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
+          asset_name: tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
+          asset_content_type: application/zip

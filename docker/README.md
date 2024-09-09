@@ -13,10 +13,6 @@ Docker container for Prestashop.
 
 ## Usage
 
-Build the image
-
-- ```./build.sh```
-
 Start the container:
 
 - ```docker-compose up```
@@ -28,10 +24,6 @@ Stop the container:
 Destroy the container:
 
 - ```docker-compose down```
-
-Build the image of a specific version:
-
-- ```./build.sh <env-file>```
 
 Start the container of a specific version:
 
