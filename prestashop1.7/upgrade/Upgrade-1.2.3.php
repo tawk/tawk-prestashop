@@ -89,7 +89,7 @@ function update_visibility_opts($shop_group_id = null, $shop_id = null)
     $opts = Configuration::get(TawkTo::TAWKTO_WIDGET_OPTS, null, $shop_group_id, $shop_id);
 
     if (!$opts) {
-        return false;
+        return true;
     }
 
     $opts = json_decode($opts);
