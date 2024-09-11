@@ -149,7 +149,7 @@ class Tawkto extends Module
                 }
 
                 if (!$show) {
-                    return '';
+                    return;
                 }
             } else {
                 // hide on specified urls
@@ -161,7 +161,7 @@ class Tawkto extends Module
                 }
 
                 if (!$show) {
-                    return '';
+                    return;
                 }
             }
         }

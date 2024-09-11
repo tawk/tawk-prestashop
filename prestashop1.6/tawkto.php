@@ -148,7 +148,7 @@ class Tawkto extends Module
                 }
 
                 if (!$show) {
-                    return '';
+                    return;
                 }
             }
         }
