@@ -12,7 +12,7 @@
  * to support@tawk.to so we can send you a copy immediately.
  *
  * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2022 tawk.to
+ * @copyright Copyright (c) 2014-2024 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *}
 
