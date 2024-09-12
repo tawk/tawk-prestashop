@@ -39,3 +39,4 @@ retrieve_version() {
 
 build_release_file 1.6;
 build_release_file 1.7;
+build_release_file 8.x

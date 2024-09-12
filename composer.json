@@ -13,7 +13,6 @@
     },
     "license": "AFL-3.0",
     "scripts": {
-        "post-install-cmd": "npm install",
         "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
         "lint:fix": "php-cs-fixer fix --config='.php-cs-fixer.dist.php'",
         "auto-index": "composer run auto-index:1.6 && composer run auto-index:1.7",
@@ -21,9 +20,10 @@
         "auto-index:1.7": "autoindex prestashop:add:index ./prestashop1.7",
         "build": "composer run build:dev && composer run build:prod",
         "build:dev": "composer install",
-        "build:prod": "composer run build:1.6 && composer run build:1.7",
+        "build:prod": "composer run build:1.6 && composer run build:1.7 && composer run build:8",
         "build:1.6": "COMPOSER_VENDOR_DIR=./prestashop1.6/vendor composer install --no-dev",
-        "build:1.7": "COMPOSER_VENDOR_DIR=./prestashop1.7/vendor composer install --no-dev"
+        "build:1.7": "COMPOSER_VENDOR_DIR=./prestashop1.7/vendor composer install --no-dev",
+        "build:8": "COMPOSER_VENDOR_DIR=./prestashop8.x/vendor composer install --no-dev"
     },
     "require-dev": {
         "prestashop/autoindex": "^2.0",

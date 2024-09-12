@@ -16,7 +16,7 @@ services:
       - db
     image: prestashop/prestashop:${PRESTASHOP_IMAGE_VERSION}
     ports:
-       - 8000:80
+      - 8000:80
     volumes:
       - web_data:/var/www/html
       - type: bind
@@ -34,7 +34,7 @@ services:
       PS_FOLDER_INSTALL: install_ps
       PS_DOMAIN: localhost:8000
       ADMIN_MAIL: admin@example.com
-      ADMIN_PASSWD: adminps
+      ADMIN_PASSWD: adminps123
 
 volumes:
   db_data:

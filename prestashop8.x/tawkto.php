@@ -1,5 +1,4 @@
 <?php
-
 /**
  * tawk.to
  *
@@ -14,7 +13,7 @@
  * to support@tawk.to so we can send you a copy immediately.
  *
  * @author tawkto support@tawk.to
- * @copyright Copyright (c) 2014-2022 tawk.to
+ * @copyright Copyright (c) 2014-2021 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 if (!defined('_PS_VERSION_')) {
@@ -48,8 +47,7 @@ class Tawkto extends Module
         $this->version = '1.3.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '1.6'];
-        $this->dependencies = ['blockcart'];
+        $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '8.1.99'];
 
         parent::__construct();
 
@@ -58,8 +56,8 @@ class Tawkto extends Module
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
-        if (!Configuration::get('MYMODULE_NAME')) {
-            $this->warning = $this->l('No name provided');
+        if (!Configuration::get(self::TAWKTO_SELECTED_WIDGET)) {
+            $this->warning = $this->l('No widget selected');
         }
     }
 
@@ -70,7 +68,7 @@ class Tawkto extends Module
      */
     public function install()
     {
-        return parent::install() && $this->registerHook('footer') && $this->installTab();
+        return parent::install() && $this->registerHook('displayFooter') && $this->installTab();
     }
 
     /**
@@ -114,6 +112,7 @@ class Tawkto extends Module
         $enable_visitor_recognition = true; // default value
         if ($result) {
             $options = json_decode($result);
+            $current_page = (string) $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
             if (isset($options->enable_visitor_recognition)) {
                 $enable_visitor_recognition = $options->enable_visitor_recognition;
@@ -125,26 +124,40 @@ class Tawkto extends Module
                 $show_pages = $this->getArrayFromJson($options->show_oncustom);
 
                 $show = false;
-                if (UrlPatternMatcher::match($_SERVER['REQUEST_URI'], $show_pages)) {
+                if (UrlPatternMatcher::match($current_page, $show_pages)) {
                     $show = true;
                 }
 
                 if (!$show) {
-                    if ('index' == $this->context->controller->php_self) {
-                        if ($options->show_onfrontpage) {
-                            $show = true;
-                        }
-                    }
-                    if ('category' == $this->context->controller->php_self) {
-                        if ($options->show_oncategory) {
-                            $show = true;
-                        }
-                    }
                     if ('product' == $this->context->controller->php_self) {
                         if ($options->show_onproduct) {
                             $show = true;
                         }
                     }
+
+                    if ('category' == $this->context->controller->php_self) {
+                        if ($options->show_oncategory) {
+                            $show = true;
+                        }
+                    }
+
+                    if ('index' == $this->context->controller->php_self) {
+                        if ($options->show_onfrontpage) {
+                            $show = true;
+                        }
+                    }
+                }
+
+                if (!$show) {
+                    return;
+                }
+            } else {
+                // hide on specified urls
+                $hide_pages = $this->getArrayFromJson($options->hide_oncustom);
+
+                $show = true;
+                if (UrlPatternMatcher::match($current_page, $hide_pages)) {
+                    $show = false;
                 }
 
                 if (!$show) {
@@ -229,7 +242,7 @@ class Tawkto extends Module
      *
      * @return array[string]string
      */
-    public function getPropertyAndWidget()
+    public static function getPropertyAndWidget()
     {
         $current_widget = Configuration::get(self::TAWKTO_SELECTED_WIDGET);
         if (empty($current_widget)) {
@@ -238,8 +251,7 @@ class Tawkto extends Module
 
         $current_widget = explode(':', $current_widget);
         if (count($current_widget) < 2) {
-            // this means that something went wrong when saving the property and
-            // widget.
+            // this means that something went wrong when saving the property and widget.
             return null;
         }
 
