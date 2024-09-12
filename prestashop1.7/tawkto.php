@@ -45,7 +45,7 @@ class Tawkto extends Module
     {
         $this->name = 'tawkto';
         $this->tab = 'front_office_features';
-        $this->version = '1.3.0';
+        $this->version = '1.4.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '1.7'];

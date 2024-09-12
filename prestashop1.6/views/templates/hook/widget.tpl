@@ -15,7 +15,7 @@
  * @copyright Copyright (c) 2014-2024 tawk.to
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *}
-<!--Start of Tawk.to Script-->
+<!--Start of Tawk.to Script (1.4.0)-->
 <script type="text/javascript">
 var $_Tawk_API={},$_Tawk_LoadStart=new Date();
 (function(){
