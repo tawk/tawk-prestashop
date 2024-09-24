@@ -16,14 +16,14 @@ Don’t have a tawk.to account yet? [Create one here.](https://www.tawk.to/?utm_
 This section describes how to install the plugin and get it working.
 
 ### Module Installer
-1. Download the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+1. Download the `tawk-prestashop-8.x-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
 3. Click `Upload a module`, upload the zip file, and the module will install automatically.
 
 ### Manual Installation
-1. Download and extract the `tawk-prestashop-1.7-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
+1. Download and extract the `tawk-prestashop-8.x-<release_verion>.zip` from [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Upload `tawkto` directory to the `/modules/` directory.
-3. Go to `Dashboard` -> `Modules` -> `Module Catalog`.
+3. Go to `Dashboard` -> `Modules` -> `Module Manager`.
 4. Search for the `tawk.to` plugin and `install`.
 
 ### Where is the configuration page located?
