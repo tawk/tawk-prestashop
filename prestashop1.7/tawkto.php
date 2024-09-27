@@ -243,7 +243,7 @@ class Tawkto extends Module
      *
      * @return array[string]string
      */
-    public function getPropertyAndWidget()
+    public static function getPropertyAndWidget()
     {
         $current_widget = Configuration::get(self::TAWKTO_SELECTED_WIDGET);
         if (empty($current_widget)) {
