@@ -13,7 +13,7 @@
     },
     "license": "AFL-3.0",
     "scripts": {
-        "post-install-cmd": "[ -z \"$GITHUB_ACTIONS\" ] && npm install",
+        "post-install-cmd": "if [ -z \"$GITHUB_ACTIONS\" ]; then npm install; fi",
         "lint": "phpcs -p -s -v --runtime-set ignore_warnings_on_exit true .",
         "lint:fix": "php-cs-fixer fix --config='.php-cs-fixer.dist.php'",
         "auto-index": "composer run auto-index:1.6 && composer run auto-index:1.7 && composer run auto-index:8",
