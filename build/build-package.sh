@@ -37,6 +37,5 @@ retrieve_version() {
     awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' $ps_dir/config.xml | xargs;
 }
 
-build_release_file 1.6;
 build_release_file 1.7;
 build_release_file 8.x

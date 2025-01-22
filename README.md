@@ -62,20 +62,22 @@ automatically.
 It is under `Dashboard` -> `More` -> `tawk.to`.
 
 ### Prestashop 1.6
-This section describes how to install the plugin and get it working on
-Prestashop 1.6
+We will no longer support Prestashop 1.6. However, you can still use the older
+version of the plugin by following the instructions below. Please note that the
+older version will not include the latest features, bug fixes, or security
+updates.
 
 #### Module Installer
-1. Download the `tawk-prestashop-1.6-<release_verion>.zip` from
-[latest release.](https://github.com/tawk/tawk-prestashop/releases)
+1. Download the `tawk-prestashop-1.6-1.5.0.zip` from
+[here.](https://github.com/tawk/tawk-prestashop/releases/tag/1.5.0)
 2. Go to `Dashboard` -> `Modules and Services`.
 3. Click `Add a new module`, upload the zip file, and click
 `Upload this module`.
 4. Search for the `tawk.to` plugin and `install`.
 
 #### Manual Installation
-1. Download and extract the `tawk-prestashop-1.6-<release_verion>.zip` from
-[latest release.](https://github.com/tawk/tawk-prestashop/releases)
+1. Download and extract the `tawk-prestashop-1.6-1.5.0.zip` from
+[here.](https://github.com/tawk/tawk-prestashop/releases/tag/1.5.0)
 2. Upload `tawkto` directory to the `/modules/` directory.
 3. Go to `Dashboard` -> `Modules and Services`.
 4. Search for the `tawk.to` plugin and `install`.

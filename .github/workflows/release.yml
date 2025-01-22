@@ -17,7 +17,6 @@ jobs:
         with:
           path: |
             ./vendor
-            ./prestashop1.6/vendor
             ./prestashop1.7/vendor
             ./prestashop8.x/vendor
           # the key will change if composer.lock changes
@@ -34,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ps_version: ['1.6', '1.7', '8.x']
+        ps_version: ['1.7', '8.x']
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -45,7 +44,6 @@ jobs:
         with:
           path: |
             ./vendor
-            ./prestashop1.6/vendor
             ./prestashop1.7/vendor
             ./prestashop8.x/vendor
           # the key will change if composer.lock changes
