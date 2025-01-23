@@ -196,7 +196,7 @@
                         <label>
                             <input type="checkbox" name="enable_visitor_recognition"
                                 id="enable_visitor_recognition" value="1"
-                                {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
+                                {if is_null($widget_opts) || is_null($widget_opts->enable_visitor_recognition) || $widget_opts->enable_visitor_recognition}
                                     checked
                                 {/if}
                             />
@@ -221,7 +221,7 @@
                         <label>
                             <input type="checkbox" name="always_display"
                                 id="always_display" value="1"
-                                {if is_null($display_opts) || $display_opts->always_display}
+                                {if is_null($widget_opts) || $widget_opts->always_display}
                                     checked
                                 {/if}
                             />
@@ -239,8 +239,8 @@
                 </label>
                 <div class="col-lg-6 control-label">
                     <label>
-                    {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
-                        {$whitelist = json_decode($display_opts->hide_oncustom)}
+                    {if (!is_null($widget_opts) && !empty($widget_opts->hide_oncustom)) }
+                        {$whitelist = json_decode($widget_opts->hide_oncustom)}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                     {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
@@ -295,7 +295,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onfrontpage"
                                 id="show_onfrontpage" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onfrontpage}
+                                {if !is_null($widget_opts) && $widget_opts->show_onfrontpage}
                                     checked
                                 {/if}
                             />
@@ -316,7 +316,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_oncategory"
                                 id="show_oncategory" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_oncategory}
+                                {if !is_null($widget_opts) && $widget_opts->show_oncategory}
                                     checked
                                 {/if}
                             />
@@ -337,7 +337,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onproduct"
                                 id="show_onproduct" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onproduct}
+                                {if !is_null($widget_opts) && $widget_opts->show_onproduct}
                                     checked
                                 {/if}
                             />
@@ -356,8 +356,8 @@
                 <div class="col-lg-9">
                     <div class="text">
                         <label>
-                        {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
-                            {$whitelist = json_decode($display_opts->show_oncustom)}
+                        {if (!is_null($widget_opts) && !empty($widget_opts->show_oncustom)) }
+                            {$whitelist = json_decode($widget_opts->show_oncustom)}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>

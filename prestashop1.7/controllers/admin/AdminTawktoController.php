@@ -87,11 +87,11 @@ class AdminTawktoController extends ModuleAdminController
         $optKey = TawkTo::TAWKTO_WIDGET_OPTS;
 
         // returns 'false' if retrieved none.
-        $displayOpts = Configuration::get($optKey);
-        if (!$displayOpts) {
-            $displayOpts = null;
+        $widgetOpts = Configuration::get($optKey);
+        if (!$widgetOpts) {
+            $widgetOpts = null;
         }
-        $displayOpts = Tools::jsonDecode($displayOpts);
+        $widgetOpts = Tools::jsonDecode($widgetOpts);
 
         $sameUser = true; // assuming there is only one admin by default
         $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
@@ -113,7 +113,7 @@ class AdminTawktoController extends ModuleAdminController
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
             'tab_id' => (int) $this->context->controller->id,
             'domain' => $domain,
-            'display_opts' => $displayOpts,
+            'widget_opts' => $widgetOpts,
             'page_id' => $pageId,
             'widget_id' => $widgetId,
             'same_user' => $sameUser,
