@@ -221,8 +221,35 @@ class AdminTawktoController extends ModuleAdminController
      *
      * @return void
      */
-    public function ajaxProcessSetVisibility()
+    public function ajaxProcessSetOptions()
     {
+        $key = TawkTo::TAWKTO_WIDGET_OPTS;
+
+        // Apply selected options
+        $jsonOpts = $this->processSetOptions(Tools::getValue('options'));
+
+        // Override current options/fallback if not selected
+        $currentOpts = Configuration::get($key);
+        if (!empty($currentOpts)) {
+            $currentOpts = json_decode($currentOpts, true);
+            $jsonOpts = array_merge($currentOpts, $jsonOpts);
+        }
+
+        Configuration::updateValue($key, json_encode($jsonOpts));
+
+        die(json_encode(['success' => true]));
+    }
+
+    /**
+     * Process options
+     *
+     * @param string $options Selected options
+     *
+     * @return array
+     */
+    private function processSetOptions(string $options): array
+    {
+        // default options
         $jsonOpts = [
             'always_display' => false,
 
@@ -241,38 +268,35 @@ class AdminTawktoController extends ModuleAdminController
             'enable_visitor_recognition' => false,
         ];
 
-        $options = Tools::getValue('options');
-        if (!empty($options)) {
-            $options = explode('&', $options);
-            foreach ($options as $post) {
-                [$column, $value] = explode('=', $post);
-                switch ($column) {
-                    case 'hide_oncustom':
-                    case 'show_oncustom':
-                        // replace newlines and returns with comma, and convert to array for
-                        // saving
-                        $value = urldecode($value);
-                        $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
-                        if (!empty($value)) {
-                            $value = explode(',', $value);
-                            $jsonOpts[$column] = json_encode($value);
-                        }
-                        break;
+        if (empty($options)) {
+            return $jsonOpts;
+        }
 
-                    case 'show_onfrontpage':
-                    case 'show_oncategory':
-                    case 'show_onproduct':
-                    case 'always_display':
-                    case 'enable_visitor_recognition':
-                        $jsonOpts[$column] = ($value == 1);
-                        break;
-                }
+        $options = explode('&', $options);
+        foreach ($options as $post) {
+            [$column, $value] = explode('=', $post);
+            switch ($column) {
+                case 'hide_oncustom':
+                case 'show_oncustom':
+                    // replace newlines and returns with comma, and convert to array for saving
+                    $value = urldecode($value);
+                    $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
+                    if (!empty($value)) {
+                        $value = explode(',', $value);
+                        $jsonOpts[$column] = json_encode($value);
+                    }
+                    break;
+
+                case 'show_onfrontpage':
+                case 'show_oncategory':
+                case 'show_onproduct':
+                case 'always_display':
+                case 'enable_visitor_recognition':
+                    $jsonOpts[$column] = ($value == 1);
+                    break;
             }
         }
 
-        $key = TawkTo::TAWKTO_WIDGET_OPTS;
-        Configuration::updateValue($key, json_encode($jsonOpts));
-
-        die(Tools::jsonEncode(['success' => true]));
+        return $jsonOpts;
     }
 }

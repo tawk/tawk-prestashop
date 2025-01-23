@@ -207,7 +207,7 @@
         </div>
     </div>
     <div class="panel" id="fieldset_1">
-        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
+        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Options </div>
         <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
@@ -421,7 +421,7 @@ jQuery(document).ready(function() {
             dataType : 'json',
             data : {
                 controller : 'AdminTawkto',
-                action : 'setVisibility',
+                action : 'setOptions',
                 ajax : true,
                 id_tab : current_id_tab,
                 pageId : $('input[name="page_id"]').val(),
