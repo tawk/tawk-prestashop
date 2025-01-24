@@ -25,6 +25,8 @@ if (!defined('_PS_VERSION_')) {
  */
 class AdminTawktoController extends ModuleAdminController
 {
+    public const NO_CHANGE = 'nochange';
+
     /**
      * __construct
      *
@@ -91,6 +93,10 @@ class AdminTawktoController extends ModuleAdminController
             $widgetOpts = null;
         }
         $widgetOpts = json_decode($widgetOpts, false);
+
+        if (!empty($widgetOpts->js_api_key)) {
+            $widgetOpts->js_api_key = self::NO_CHANGE;
+        }
 
         $sameUser = true; // assuming there is only one admin by default
         $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
@@ -224,9 +230,14 @@ class AdminTawktoController extends ModuleAdminController
     public function ajaxProcessSetOptions()
     {
         $key = TawkTo::TAWKTO_WIDGET_OPTS;
+        $jsonOpts = [];
 
-        // Apply selected options
-        $jsonOpts = $this->processSetOptions(Tools::getValue('options'));
+        try {
+            // Process selected options
+            $jsonOpts = $this->processSetOptions(Tools::getValue('options'));
+        } catch (Exception $e) {
+            die(json_encode(['success' => false, 'message' => $e->getMessage()]));
+        }
 
         // Override current options/fallback if not selected
         $currentOpts = Configuration::get($key);
@@ -246,6 +257,8 @@ class AdminTawktoController extends ModuleAdminController
      * @param string $options Selected options
      *
      * @return array
+     *
+     * @throws Exception Error processing options
      */
     private function processSetOptions(string $options): array
     {
@@ -266,6 +279,7 @@ class AdminTawktoController extends ModuleAdminController
             'show_oncustom' => json_encode([]),
 
             'enable_visitor_recognition' => false,
+            'js_api_key' => '',
         ];
 
         if (empty($options)) {
@@ -294,9 +308,69 @@ class AdminTawktoController extends ModuleAdminController
                 case 'enable_visitor_recognition':
                     $jsonOpts[$column] = ($value == 1);
                     break;
+
+                case 'js_api_key':
+                    if ($value === self::NO_CHANGE) {
+                        unset($jsonOpts['js_api_key']);
+                        break;
+                    }
+
+                    if ($value === '') {
+                        break;
+                    }
+
+                    try {
+                        if (strlen(trim($value)) !== 40) {
+                            throw new Exception('Invalid API key. Please provide value with 40 characters');
+                        }
+
+                        $jsonOpts['js_api_key'] = $this->encryptData($value);
+                    } catch (Exception $e) {
+                        unset($jsonOpts['js_api_key']);
+
+                        throw new Exception('Javascript API Key: ' . $e->getMessage());
+                    }
+
+                    break;
             }
         }
 
         return $jsonOpts;
+    }
+
+    /**
+     * Encrypt data
+     *
+     * @param string $data Data to encrypt
+     *
+     * @return string Encrypted data
+     *
+     * @throws Exception Error encrypting data
+     */
+    private function encryptData(string $data)
+    {
+        if (!defined('_COOKIE_KEY_')) {
+            throw new Exception('Cookie key not defined');
+        }
+
+        try {
+            $iv = random_bytes(16);
+        } catch (Exception $e) {
+            throw new Exception('Failed to generate IV');
+        }
+
+        $encrypted = openssl_encrypt($data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
+
+        if ($encrypted === false) {
+            throw new Exception('Failed to encrypt data');
+        }
+
+        $encrypted = base64_encode($iv . $encrypted);
+
+        if ($encrypted === false) {
+            throw new Exception('Failed to encode data');
+        }
+
+        return $encrypted;
     }
 }

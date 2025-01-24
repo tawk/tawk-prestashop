@@ -168,19 +168,29 @@ class Tawkto extends Module
         }
 
         // add customer details as visitor info
-        $customer_name = null;
-        $customer_email = null;
+        $customer_name = '';
+        $customer_email = '';
+        $hash = '';
         if ($enable_visitor_recognition && !is_null($this->context->customer->id)) {
             $customer = $this->context->customer;
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
             $customer_email = $customer->email;
+
+            if (!empty($options->js_api_key)) {
+                $key = $this->getJsApiKey($options->js_api_key);
+
+                if (!empty($key)) {
+                    $hash = hash_hmac('sha256', $customer_email, $key);
+                }
+            }
         }
 
         $this->context->smarty->assign([
             'widget_id' => $widgetId,
             'page_id' => $pageId,
-            'customer_name' => (!is_null($customer_name)) ? $customer_name : '',
-            'customer_email' => (!is_null($customer_email)) ? $customer_email : '',
+            'customer_name' => $customer_name,
+            'customer_email' => $customer_email,
+            'hash' => $hash,
         ]);
 
         return $this->display(__FILE__, 'widget.tpl');
@@ -282,5 +292,48 @@ class Tawkto extends Module
         }
 
         return $arr;
+    }
+
+    /**
+     * Retrieve JS API key
+     *
+     * @param string $js_api_key Encrypted JS API key
+     *
+     * @return string
+     */
+    private function getJsApiKey(string $js_api_key)
+    {
+        // Cache::store & Cache::retrieve are not persistent
+
+        $key = $this->getDecryptedData($js_api_key);
+
+        return $key;
+    }
+
+    /**
+     * Decrypt data
+     *
+     * @param string $data Data to decrypt
+     *
+     * @return string
+     */
+    private function getDecryptedData(string $data)
+    {
+        $decoded = base64_decode($data);
+
+        if ($decoded === false) {
+            return '';
+        }
+
+        $iv = substr($decoded, 0, 16);
+        $encrypted_data = substr($decoded, 16);
+
+        $decrypted_data = openssl_decrypt($encrypted_data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
+
+        if ($decrypted_data === false) {
+            return '';
+        }
+
+        return $decrypted_data;
     }
 }

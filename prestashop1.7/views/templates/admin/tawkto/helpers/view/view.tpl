@@ -67,6 +67,13 @@
 .tawk-tooltip:hover .tawk-tooltiptext {
   visibility: visible;
 }
+
+.options-alert {
+    width: 50%;
+    float: left;
+    font-weight: bold;
+    display: none;
+}
 </style>
 
 <iframe
@@ -199,6 +206,26 @@
                                 {if is_null($widget_opts) || is_null($widget_opts->enable_visitor_recognition) || $widget_opts->enable_visitor_recognition}
                                     checked
                                 {/if}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class='tawk-notice'>
+                Note: If Secure Mode is enabled on your property, please enter your Javascript API Key to ensure visitor recognition works correctly.
+            </p>
+            <div class="form-group row">
+                <label class="control-label col-lg-3">
+                    <span data-toggle="tooltip" data-html="true"
+                        title=""  data-original-title="Javascript API Key">
+                        Javascript API Key
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <div class="radio ">
+                        <label>
+                            <input type="password" name="js_api_key" id="js_api_key"
+                                value="{if !is_null($widget_opts) && $widget_opts->js_api_key}{$widget_opts->js_api_key|escape:'html':'UTF-8'}{/if}"
                             />
                         </label>
                     </div>
@@ -400,7 +427,8 @@
             </div>
         </div>
         <div class="panel-footer">
-            <div id="optionsSuccessMessage" style="width: 50%; float: left; background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success">Successfully set widget options to your site</div>
+            <div id="optionsSuccessMessage" style="background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6;" class="alert alert-success options-alert">Successfully set widget options to your site</div>
+            <div id="optionsFailureMessage" class="alert alert-danger options-alert"></div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
@@ -433,6 +461,7 @@ jQuery(document).ready(function() {
                 if(r.success) {
                     $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
                 } else {
+                    $('#optionsFailureMessage').text(r.message).toggle().delay(3000).fadeOut();
                 }
             }
         });
@@ -454,6 +483,20 @@ jQuery(document).ready(function() {
         } else {
             jQuery('.hide_specific').prop('disabled', true);
             jQuery('.show_specific').prop('disabled', false);
+        }
+    });
+
+    if (jQuery('#enable_visitor_recognition').prop("checked")) {
+        jQuery('#js_api_key').prop('disabled', false);
+    } else {
+        jQuery('#js_api_key').prop('disabled', true);
+    }
+
+    jQuery('#enable_visitor_recognition').change(function() {
+        if (this.checked) {
+            jQuery('#js_api_key').prop('disabled', false);
+        } else {
+            jQuery('#js_api_key').prop('disabled', true);
         }
     });
     {/literal}
