@@ -3,8 +3,8 @@
 ini_set('memory_limit', '256M');
 
 $finder = PhpCsFixer\Finder::create()->in([
-    __DIR__ . '/prestashop1.6',
     __DIR__ . '/prestashop1.7',
+    __DIR__ . '/prestashop8.x',
 ]);
 
 return (new PhpCsFixer\Config())
