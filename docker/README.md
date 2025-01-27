@@ -4,7 +4,7 @@ Prestashop
 Docker container for Prestashop.
 
 ## Information
-- Prestashop Versions: 1.6, 1.7.6, 1.7.7, latest
+- Prestashop Versions: 1.7.6, 1.7.7, latest
 - MySQL Version: 5.7
 
 ## Pre-Requisites
