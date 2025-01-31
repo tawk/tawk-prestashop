@@ -485,20 +485,6 @@ jQuery(document).ready(function() {
             jQuery('.show_specific').prop('disabled', false);
         }
     });
-
-    if (jQuery('#enable_visitor_recognition').prop("checked")) {
-        jQuery('#js_api_key').prop('disabled', false);
-    } else {
-        jQuery('#js_api_key').prop('disabled', true);
-    }
-
-    jQuery('#enable_visitor_recognition').change(function() {
-        if (this.checked) {
-            jQuery('#js_api_key').prop('disabled', false);
-        } else {
-            jQuery('#js_api_key').prop('disabled', true);
-        }
-    });
     {/literal}
 });
 </script>
