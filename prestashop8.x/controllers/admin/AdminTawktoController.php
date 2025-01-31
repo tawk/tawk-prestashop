@@ -254,13 +254,13 @@ class AdminTawktoController extends ModuleAdminController
     /**
      * Process options
      *
-     * @param string $options Selected options
+     * @param string $params Selected options
      *
      * @return array
      *
      * @throws Exception Error processing options
      */
-    private function processSetOptions(string $options): array
+    private function processSetOptions(string $params): array
     {
         // default options
         $jsonOpts = [
@@ -282,13 +282,12 @@ class AdminTawktoController extends ModuleAdminController
             'js_api_key' => '',
         ];
 
-        if (empty($options)) {
+        if (empty($params)) {
             return $jsonOpts;
         }
 
-        $options = explode('&', $options);
-        foreach ($options as $post) {
-            [$column, $value] = explode('=', $post);
+        parse_str($params, $options);
+        foreach ($options as $column => $value) {
             switch ($column) {
                 case 'hide_oncustom':
                 case 'show_oncustom':
