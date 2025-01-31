@@ -176,12 +176,11 @@ class Tawkto extends Module
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
             $customer_email = $customer->email;
 
-            if (!empty($options->js_api_key)) {
+            try {
                 $key = $this->getJsApiKey($options->js_api_key);
-
-                if (!empty($key)) {
-                    $hash = hash_hmac('sha256', $customer_email, $key);
-                }
+                $hash = hash_hmac('sha256', $customer_email, $key);
+            } catch (Exception $e) {
+                $hash = '';
             }
         }
 
@@ -300,9 +299,15 @@ class Tawkto extends Module
      * @param string $js_api_key Encrypted JS API key
      *
      * @return string
+     *
+     * @throws Exception error retrieving JS API key
      */
     private function getJsApiKey(string $js_api_key)
     {
+        if (empty($js_api_key)) {
+            throw new Exception('JS API key is empty');
+        }
+
         // Cache::store & Cache::retrieve are not persistent
 
         $key = $this->getDecryptedData($js_api_key);
@@ -315,14 +320,20 @@ class Tawkto extends Module
      *
      * @param string $data Data to decrypt
      *
-     * @return string
+     * @return string Decrypted data
+     *
+     * @throws Exception error decrypting data
      */
     private function getDecryptedData(string $data)
     {
+        if (!defined('_COOKIE_KEY_')) {
+            throw new Exception('Cookie key not defined');
+        }
+
         $decoded = base64_decode($data);
 
         if ($decoded === false) {
-            return '';
+            throw new Exception('Failed to decode data');
         }
 
         $iv = substr($decoded, 0, 16);
@@ -331,7 +342,7 @@ class Tawkto extends Module
         $decrypted_data = openssl_decrypt($encrypted_data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
 
         if ($decrypted_data === false) {
-            return '';
+            throw new Exception('Failed to decrypt data');
         }
 
         return $decrypted_data;
