@@ -168,19 +168,28 @@ class Tawkto extends Module
         }
 
         // add customer details as visitor info
-        $customer_name = null;
-        $customer_email = null;
+        $customer_name = '';
+        $customer_email = '';
+        $hash = '';
         if ($enable_visitor_recognition && !is_null($this->context->customer->id)) {
             $customer = $this->context->customer;
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
             $customer_email = $customer->email;
+
+            try {
+                $key = $this->getJsApiKey($options->js_api_key);
+                $hash = hash_hmac('sha256', $customer_email, $key);
+            } catch (Exception $e) {
+                $hash = '';
+            }
         }
 
         $this->context->smarty->assign([
             'widget_id' => $widgetId,
             'page_id' => $pageId,
-            'customer_name' => (!is_null($customer_name)) ? $customer_name : '',
-            'customer_email' => (!is_null($customer_email)) ? $customer_email : '',
+            'customer_name' => $customer_name,
+            'customer_email' => $customer_email,
+            'hash' => $hash,
         ]);
 
         return $this->display(__FILE__, 'widget.tpl');
@@ -282,5 +291,60 @@ class Tawkto extends Module
         }
 
         return $arr;
+    }
+
+    /**
+     * Retrieve JS API key
+     *
+     * @param string $js_api_key Encrypted JS API key
+     *
+     * @return string
+     *
+     * @throws Exception error retrieving JS API key
+     */
+    private function getJsApiKey(string $js_api_key)
+    {
+        if (empty($js_api_key)) {
+            throw new Exception('JS API key is empty');
+        }
+
+        // Cache::store & Cache::retrieve are not persistent
+
+        $key = $this->getDecryptedData($js_api_key);
+
+        return $key;
+    }
+
+    /**
+     * Decrypt data
+     *
+     * @param string $data Data to decrypt
+     *
+     * @return string Decrypted data
+     *
+     * @throws Exception error decrypting data
+     */
+    private function getDecryptedData(string $data)
+    {
+        if (!defined('_COOKIE_KEY_')) {
+            throw new Exception('Cookie key not defined');
+        }
+
+        $decoded = base64_decode($data);
+
+        if ($decoded === false) {
+            throw new Exception('Failed to decode data');
+        }
+
+        $iv = substr($decoded, 0, 16);
+        $encrypted_data = substr($decoded, 16);
+
+        $decrypted_data = openssl_decrypt($encrypted_data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
+
+        if ($decrypted_data === false) {
+            throw new Exception('Failed to decrypt data');
+        }
+
+        return $decrypted_data;
     }
 }
