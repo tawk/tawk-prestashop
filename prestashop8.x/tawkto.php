@@ -101,7 +101,9 @@ class Tawkto extends Module
      */
     public function hookDisplayFooter()
     {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
 
         $current_widget = self::getPropertyAndWidget();
         if (empty($current_widget)) {
