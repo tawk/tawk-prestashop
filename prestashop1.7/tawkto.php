@@ -35,6 +35,7 @@ class Tawkto extends Module
     public const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     public const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
     public const TAWKTO_SELECTED_WIDGET = 'TAWKTO_SELECTED_WIDGET';
+    public const TAWKTO_JS_API_KEY = 'TAWKTO_JS_API_KEY';
 
     /**
      * __construct
@@ -101,6 +102,8 @@ class Tawkto extends Module
      */
     public function hookDisplayFooter()
     {
+        session_start();
+
         $current_widget = self::getPropertyAndWidget();
         if (empty($current_widget)) {
             return '';
@@ -308,9 +311,13 @@ class Tawkto extends Module
             throw new Exception('JS API key is empty');
         }
 
-        // Cache::store & Cache::retrieve are not persistent
+        if (isset($_SESSION[self::TAWKTO_JS_API_KEY])) {
+            return $_SESSION[self::TAWKTO_JS_API_KEY];
+        }
 
         $key = $this->getDecryptedData($js_api_key);
+
+        $_SESSION[self::TAWKTO_JS_API_KEY] = $key;
 
         return $key;
     }
