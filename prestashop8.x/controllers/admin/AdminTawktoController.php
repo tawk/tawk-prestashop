@@ -248,6 +248,12 @@ class AdminTawktoController extends ModuleAdminController
             }
         }
 
+        if (!isset($jsonOpts['config_version'])) {
+            $jsonOpts['config_version'] = 0;
+        } else {
+            ++$jsonOpts['config_version'];
+        }
+
         Configuration::updateValue($key, json_encode($jsonOpts));
 
         die(json_encode(['success' => true]));
