@@ -243,7 +243,9 @@ class AdminTawktoController extends ModuleAdminController
         $currentOpts = Configuration::get($key);
         if (!empty($currentOpts)) {
             $currentOpts = json_decode($currentOpts, true);
-            $jsonOpts = array_merge($currentOpts, $jsonOpts);
+            if (is_array($currentOpts)) {
+                $jsonOpts = array_merge($currentOpts, $jsonOpts);
+            }
         }
 
         Configuration::updateValue($key, json_encode($jsonOpts));
