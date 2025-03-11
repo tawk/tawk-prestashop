@@ -320,16 +320,20 @@ class AdminTawktoController extends ModuleAdminController
                         break;
                     }
 
-                    try {
-                        if (strlen(trim($value)) !== 40) {
-                            throw new Exception('Invalid API key. Please provide value with 40 characters');
-                        }
+                    $value = trim($value);
 
+                    if (strlen($value) !== 40) {
+                        throw new Exception('Invalid API key.');
+                    }
+
+                    try {
                         $jsonOpts['js_api_key'] = $this->encryptData($value);
                     } catch (Exception $e) {
+                        error_log($e->getMessage());
+
                         unset($jsonOpts['js_api_key']);
 
-                        throw new Exception('Javascript API Key: ' . $e->getMessage());
+                        throw new Exception('Error saving Javascript API Key.');
                     }
 
                     break;
