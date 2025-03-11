@@ -94,7 +94,7 @@ class AdminTawktoController extends ModuleAdminController
         }
         $widgetOpts = json_decode($widgetOpts, false);
 
-        if (!empty($widgetOpts->js_api_key)) {
+        if ($widgetOpts && !empty($widgetOpts->js_api_key)) {
             $widgetOpts->js_api_key = self::NO_CHANGE;
         }
 
