@@ -35,7 +35,7 @@ class Tawkto extends Module
     public const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     public const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
     public const TAWKTO_SELECTED_WIDGET = 'TAWKTO_SELECTED_WIDGET';
-    public const TAWKTO_JS_API_KEY = 'TAWKTO_JS_API_KEY';
+    public const TAWKTO_VISITOR_SESSION = 'TAWKTO_VISITOR_SESSION';
 
     /**
      * __construct
@@ -115,13 +115,25 @@ class Tawkto extends Module
         $widgetId = $current_widget['widget_id'];
 
         $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
-        $enable_visitor_recognition = true; // default value
+        // default values
+        $enable_visitor_recognition = true;
+        $js_api_key = '';
+        $config_version = 0;
+
         if ($result) {
             $options = json_decode($result);
             $current_page = (string) $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
             if (isset($options->enable_visitor_recognition)) {
                 $enable_visitor_recognition = $options->enable_visitor_recognition;
+            }
+
+            if (isset($options->js_api_key)) {
+                $js_api_key = $options->js_api_key;
+            }
+
+            if (isset($options->config_version)) {
+                $config_version = $options->config_version;
             }
 
             // prepare visibility
@@ -181,12 +193,7 @@ class Tawkto extends Module
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
             $customer_email = $customer->email;
 
-            try {
-                $key = $this->getJsApiKey($options->js_api_key);
-                $hash = hash_hmac('sha256', $customer_email, $key);
-            } catch (Exception $e) {
-                $hash = '';
-            }
+            $hash = $this->getVisitorHash($customer_email, $js_api_key, $config_version);
         }
 
         $this->context->smarty->assign([
@@ -299,29 +306,47 @@ class Tawkto extends Module
     }
 
     /**
-     * Retrieve JS API key
+     * Get visitor hash
      *
-     * @param string $js_api_key Encrypted JS API key
+     * @param string $email Visitor email
+     * @param string $js_api_key JS API key
+     * @param int $config_version Config version
      *
      * @return string
-     *
-     * @throws Exception error retrieving JS API key
      */
-    private function getJsApiKey(string $js_api_key)
+    private function getVisitorHash(string $email, string $js_api_key, int $config_version)
     {
+        if (isset($_SESSION[self::TAWKTO_VISITOR_SESSION])) {
+            $current_session = $_SESSION[self::TAWKTO_VISITOR_SESSION];
+
+            if (isset($current_session['hash'])
+                && $current_session['email'] === $email
+                && $current_session['config_version'] === $config_version) {
+                return $current_session['hash'];
+            }
+        }
+
         if (empty($js_api_key)) {
-            throw new Exception('JS API key is empty');
+            return '';
         }
 
-        if (isset($_SESSION[self::TAWKTO_JS_API_KEY])) {
-            return $_SESSION[self::TAWKTO_JS_API_KEY];
+        try {
+            $key = $this->getDecryptedData($js_api_key);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+
+            return '';
         }
 
-        $key = $this->getDecryptedData($js_api_key);
+        $hash = hash_hmac('sha256', $email, $key);
 
-        $_SESSION[self::TAWKTO_JS_API_KEY] = $key;
+        $_SESSION[self::TAWKTO_VISITOR_SESSION] = [
+            'hash' => $hash,
+            'email' => $email,
+            'config_version' => $config_version,
+        ];
 
-        return $key;
+        return $hash;
     }
 
     /**
