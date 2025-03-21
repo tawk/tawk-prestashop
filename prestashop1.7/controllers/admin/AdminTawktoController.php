@@ -22,6 +22,13 @@ if (!defined('_PS_VERSION_')) {
 }
 
 /**
+ * Tawkto exception
+ */
+class TawktoException extends Exception
+{
+}
+
+/**
  * Admin settings controller
  */
 class AdminTawktoController extends ModuleAdminController
@@ -236,7 +243,11 @@ class AdminTawktoController extends ModuleAdminController
             // Process selected options
             $jsonOpts = $this->processSetOptions(Tools::getValue('options'));
         } catch (Exception $e) {
-            die(json_encode(['success' => false, 'message' => $e->getMessage()]));
+            if ($e instanceof TawktoException) {
+                die(json_encode(['success' => false, 'message' => $e->getMessage()]));
+            }
+
+            die(json_encode(['success' => false, 'message' => 'An error occurred while saving options']));
         }
 
         // Override current options/fallback if not selected
@@ -266,7 +277,7 @@ class AdminTawktoController extends ModuleAdminController
      *
      * @return array
      *
-     * @throws Exception error processing options
+     * @throws TawktoException Error processing options
      */
     private function processSetOptions(string $params): array
     {
@@ -329,7 +340,7 @@ class AdminTawktoController extends ModuleAdminController
                     $value = trim($value);
 
                     if (strlen($value) !== 40) {
-                        throw new Exception('Invalid API key.');
+                        throw new TawktoException('Invalid API key.');
                     }
 
                     try {
@@ -337,9 +348,7 @@ class AdminTawktoController extends ModuleAdminController
                     } catch (Exception $e) {
                         error_log($e->getMessage());
 
-                        unset($jsonOpts['js_api_key']);
-
-                        throw new Exception('Error saving Javascript API Key.');
+                        throw new TawktoException('Error saving Javascript API Key.');
                     }
 
                     break;
