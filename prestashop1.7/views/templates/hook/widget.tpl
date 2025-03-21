@@ -23,8 +23,8 @@ var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
    Tawk_API.visitor = {
         name  : "{$customer_name|escape:'javascript':'UTF-8'}",
         email : "{$customer_email|escape:'javascript':'UTF-8'}",
-        {if $hash != ''}
-            hash : "{$hash|escape:'javascript':'UTF-8'}"
+        {if $hash != null}
+            , hash : "{$hash}"
         {/if}
     };
 {/if}

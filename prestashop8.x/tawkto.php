@@ -182,7 +182,7 @@ class Tawkto extends Module
         // add customer details as visitor info
         $customer_name = '';
         $customer_email = '';
-        $hash = '';
+        $hash = null;
         if ($enable_visitor_recognition && !is_null($this->context->customer->id)) {
             $customer = $this->context->customer;
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
@@ -306,7 +306,7 @@ class Tawkto extends Module
      * @param string $js_api_key JS API key
      * @param int $config_version Config version
      *
-     * @return string
+     * @return string|null
      */
     private function getVisitorHash(string $email, string $js_api_key, int $config_version)
     {
@@ -325,7 +325,7 @@ class Tawkto extends Module
         }
 
         if (empty($js_api_key)) {
-            return '';
+            return null;
         }
 
         try {
@@ -333,7 +333,7 @@ class Tawkto extends Module
         } catch (Exception $e) {
             error_log($e->getMessage());
 
-            return '';
+            return null;
         }
 
         $hash = hash_hmac('sha256', $email, $key);
