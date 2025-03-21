@@ -102,10 +102,6 @@ class Tawkto extends Module
      */
     public function hookDisplayFooter()
     {
-        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
-            session_start();
-        }
-
         $current_widget = self::getPropertyAndWidget();
         if (empty($current_widget)) {
             return '';
@@ -316,6 +312,10 @@ class Tawkto extends Module
      */
     private function getVisitorHash(string $email, string $js_api_key, int $config_version)
     {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
+
         if (isset($_SESSION[self::TAWKTO_VISITOR_SESSION])) {
             $current_session = $_SESSION[self::TAWKTO_VISITOR_SESSION];
 
