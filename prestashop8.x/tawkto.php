@@ -310,6 +310,10 @@ class Tawkto extends Module
      */
     private function getVisitorHash(string $email, string $js_api_key, int $config_version)
     {
+        if (empty($js_api_key)) {
+            return null;
+        }
+
         if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
             session_start();
         }
@@ -322,10 +326,6 @@ class Tawkto extends Module
                 && $current_session['config_version'] === $config_version) {
                 return $current_session['hash'];
             }
-        }
-
-        if (empty($js_api_key)) {
-            return null;
         }
 
         try {
