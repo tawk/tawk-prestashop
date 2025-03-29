@@ -122,6 +122,7 @@ class AdminTawktoController extends ModuleAdminController
 
         $this->tpl_view_vars = [
             'iframe_url' => $this->getIframeUrl(),
+            'prestashop_version' => _PS_VERSION_,
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
             'tab_id' => (int) $this->context->controller->id,
