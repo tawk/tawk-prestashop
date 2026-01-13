@@ -21,9 +21,10 @@
         "auto-index:8": "autoindex prestashop:add:index ./prestashop8.x",
         "build": "composer run build:dev && composer run build:prod",
         "build:dev": "composer install",
-        "build:prod": "composer run build:1.7 && composer run build:8",
+        "build:prod": "composer run build:1.7 && composer run build:8 && composer run build:9",
         "build:1.7": "COMPOSER_VENDOR_DIR=./prestashop1.7/vendor composer install --no-dev",
-        "build:8": "COMPOSER_VENDOR_DIR=./prestashop8.x/vendor composer install --no-dev"
+        "build:8": "COMPOSER_VENDOR_DIR=./prestashop8.x/vendor composer install --no-dev",
+        "build:9": "COMPOSER_VENDOR_DIR=./prestashop9.x/vendor composer install --no-dev"
     },
     "require-dev": {
         "prestashop/autoindex": "^2.0",
