@@ -33,7 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ps_version: ['1.7', '8.x']
+        ps_version:
+          - { name: '1.7', dir: 'prestashop1.7' }
+          - { name: '8.x', dir: 'prestashop8.x' }
+          - { name: '9.x', dir: 'prestashop8.x' }
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -52,16 +55,16 @@ jobs:
       - name: build artifact
         run: composer run auto-index && ./build/build-package.sh
 
-      - name: set version for prestashop ${{ matrix.ps_version }}
+      - name: set version for prestashop ${{ matrix.ps_version.name }}
         id: version
-        run: echo "::set-output name=version::$(awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' ./prestashop${{ matrix.ps_version }}/config.xml | xargs)"
+        run: echo "::set-output name=version::$(awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' ./${{ matrix.ps_version.dir }}/config.xml | xargs)"
 
-      - name: upload prestashop ${{ matrix.ps_version }} artifact
+      - name: upload prestashop ${{ matrix.ps_version.name }} artifact
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./build/tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
-          asset_name: tawk-prestashop-${{ matrix.ps_version }}-${{ steps.version.outputs.version }}.zip
+          asset_path: ./build/tawk-prestashop-${{ matrix.ps_version.name }}-${{ steps.version.outputs.version }}.zip
+          asset_name: tawk-prestashop-${{ matrix.ps_version.name }}-${{ steps.version.outputs.version }}.zip
           asset_content_type: application/zip
