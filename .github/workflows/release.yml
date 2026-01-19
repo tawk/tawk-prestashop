@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: cached dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cached-dependencies
         with:
           path: |
@@ -39,7 +39,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: cached dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         id: cached-dependencies
         with:
           path: |
