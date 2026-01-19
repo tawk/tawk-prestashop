@@ -106,7 +106,10 @@ class AdminTawktoController extends ModuleAdminController
             $widgetId = $currentWidget['widget_id'];
         }
 
+        $majorVersion = explode('.', _PS_VERSION_)[0];
+
         $this->tpl_view_vars = [
+            'ps_version' => $majorVersion,
             'iframe_url' => $this->getIframeUrl(),
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
