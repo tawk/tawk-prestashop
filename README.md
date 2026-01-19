@@ -19,19 +19,21 @@ Don’t have a tawk.to account yet?
 
 ## Installation
 
-### Prestashop 8
+### Prestashop 8 & 9
 This section describes how to install the plugin and get it working on
-Prestashop 8
+Prestashop 8 and 9.
 
 #### Module Installer
-1. Download the `tawk-prestashop-8.x-<release_verion>.zip` from
+1. Download the `tawk-prestashop-8.x-<release_version>.zip` or
+`tawk-prestashop-9.x-<release_version>.zip` from
 [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
 3. Click `Upload a module`, upload the zip file, and the module will install
 automatically.
 
 #### Manual Installation
-1. Download and extract the `tawk-prestashop-8.x-<release_verion>.zip` from
+1. Download and extract the `tawk-prestashop-8.x-<release_version>.zip` or
+`tawk-prestashop-9.x-<release_version>.zip` from
 [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Upload `tawkto` directory to the `/modules/` directory.
 3. Go to `Dashboard` -> `Modules` -> `Module Manager`.
@@ -45,14 +47,14 @@ This section describes how to install the plugin and get it working on
 Prestashop 1.7
 
 #### Module Installer
-1. Download the `tawk-prestashop-1.7-<release_verion>.zip` from
+1. Download the `tawk-prestashop-1.7-<release_version>.zip` from
 [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Go to `Dashboard` -> `Modules` -> `Module Manager`.
 3. Click `Upload a module`, upload the zip file, and the module will install
 automatically.
 
 #### Manual Installation
-1. Download and extract the `tawk-prestashop-1.7-<release_verion>.zip` from
+1. Download and extract the `tawk-prestashop-1.7-<release_version>.zip` from
 [latest release.](https://github.com/tawk/tawk-prestashop/releases)
 2. Upload `tawkto` directory to the `/modules/` directory.
 3. Go to `Dashboard` -> `Modules` -> `Module Catalog`.

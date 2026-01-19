@@ -36,7 +36,7 @@ class AdminTawktoController extends ModuleAdminController
         $this->display = 'view';
 
         parent::__construct();
-        $this->meta_title = $this->l('tawk.to');
+        $this->meta_title = $this->trans('tawk.to');
 
         if (!$this->module->active) {
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminHome'));
@@ -50,8 +50,8 @@ class AdminTawktoController extends ModuleAdminController
      */
     public function initToolBarTitle()
     {
-        $this->toolbar_title[] = $this->l('tawk.to');
-        $this->toolbar_title[] = $this->l('Widget');
+        $this->toolbar_title[] = $this->trans('tawk.to');
+        $this->toolbar_title[] = $this->trans('Widget');
     }
 
     /**
@@ -106,7 +106,10 @@ class AdminTawktoController extends ModuleAdminController
             $widgetId = $currentWidget['widget_id'];
         }
 
+        $majorVersion = explode('.', _PS_VERSION_)[0];
+
         $this->tpl_view_vars = [
+            'ps_version' => $majorVersion,
             'iframe_url' => $this->getIframeUrl(),
             'base_url' => $this->getBaseUrl(),
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),

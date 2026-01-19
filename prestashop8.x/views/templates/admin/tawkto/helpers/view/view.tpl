@@ -16,8 +16,6 @@
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *}
 
-{include file="toolbar.tpl" toolbar_btn=$toolbar_btn toolbar_scroll=$toolbar_scroll title=$title}
-
 {if !$same_user}
 <div id="widget_already_set" style="width: 50%; float: left; color: #3c763d; border-color: #d6e9c6; font-weight: bold;" class="alert alert-warning">Widget set by other user</div>
 {/if}
@@ -79,7 +77,7 @@
 <script>
     var domain = "{$domain|escape:'url':'UTF-8'}";;
     var currentHost = window.location.protocol + "//" + window.location.host,
-        url = decodeURIComponent("{$iframe_url|cat:'&pltf=prestashop&pltfv=1.7&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
+        url = decodeURIComponent("{$iframe_url|cat:'&pltf=prestashop&pltfv='|cat:$ps_version|cat:'&parentDomain='|escape:'url':'UTF-8'}") + currentHost,
         baseUrl = decodeURIComponent("{$base_url|escape:'url':'UTF-8'}"),
         current_id_tab = "{$tab_id|escape:'javascript':'UTF-8'}",
         controller = decodeURIComponent("{$controller|escape:'url':'UTF-8'}");

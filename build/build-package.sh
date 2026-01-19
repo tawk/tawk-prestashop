@@ -10,7 +10,8 @@ build_release_file() {
     fi
 
     ps_version=$1;
-    ps_dir=$build_dir/../prestashop$ps_version/;
+    ps_dir_name=$2;
+    ps_dir=$build_dir/../prestashop$ps_dir_name/;
 
     echo "Building Prestashop $ps_version..."
     echo "Creating temporary directory"
@@ -37,5 +38,6 @@ retrieve_version() {
     awk 'gsub(/<version><!\[CDATA\[|]]><\/version>/,"")' $ps_dir/config.xml | xargs;
 }
 
-build_release_file 1.7;
-build_release_file 8.x
+build_release_file 1.7 1.7;
+build_release_file 8.x 8.x;
+build_release_file 9.x 8.x;
