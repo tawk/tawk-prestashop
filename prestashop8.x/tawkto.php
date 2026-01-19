@@ -47,17 +47,17 @@ class Tawkto extends Module
         $this->version = '1.5.0';
         $this->author = 'tawk.to';
         $this->need_instance = 0;
-        $this->ps_versions_compliancy = ['min' => '1.5', 'max' => '8.2.99'];
+        $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
 
         parent::__construct();
 
-        $this->displayName = $this->l('tawk.to');
-        $this->description = $this->l('tawk.to live chat integration.');
+        $this->displayName = $this->trans('tawk.to');
+        $this->description = $this->trans('tawk.to live chat integration.');
 
-        $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
+        $this->confirmUninstall = $this->trans('Are you sure you want to uninstall?');
 
         if (!Configuration::get(self::TAWKTO_SELECTED_WIDGET)) {
-            $this->warning = $this->l('No widget selected');
+            $this->warning = $this->trans('No widget selected');
         }
     }
 
