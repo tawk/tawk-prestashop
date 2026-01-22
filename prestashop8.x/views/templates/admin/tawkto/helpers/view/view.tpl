@@ -65,6 +65,13 @@
 .tawk-tooltip:hover .tawk-tooltiptext {
   visibility: visible;
 }
+
+.options-alert {
+    width: 50%;
+    float: left;
+    font-weight: bold;
+    display: none;
+}
 </style>
 
 <iframe
@@ -194,9 +201,29 @@
                         <label>
                             <input type="checkbox" name="enable_visitor_recognition"
                                 id="enable_visitor_recognition" value="1"
-                                {if is_null($display_opts) || is_null($display_opts->enable_visitor_recognition) || $display_opts->enable_visitor_recognition}
+                                {if is_null($widget_opts) || is_null($widget_opts->enable_visitor_recognition) || $widget_opts->enable_visitor_recognition}
                                     checked
                                 {/if}
+                            />
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <p class='tawk-notice'>
+                Note: If Secure Mode is enabled on your property, please enter your Javascript API Key to ensure visitor recognition works correctly.
+            </p>
+            <div class="form-group row">
+                <label class="control-label col-lg-3">
+                    <span data-toggle="tooltip" data-html="true"
+                        title=""  data-original-title="Javascript API Key">
+                        Javascript API Key
+                    </span>
+                </label>
+                <div class="col-lg-9">
+                    <div class="radio ">
+                        <label>
+                            <input type="password" name="js_api_key" id="js_api_key"
+                                value="{if !is_null($widget_opts) && $widget_opts->js_api_key}{$widget_opts->js_api_key|escape:'html':'UTF-8'}{/if}"
                             />
                         </label>
                     </div>
@@ -205,7 +232,7 @@
         </div>
     </div>
     <div class="panel" id="fieldset_1">
-        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Settings </div>
+        <div class="panel-heading"> <i class="icon-cogs"></i> Visibility Options </div>
         <div class="form-wrapper row">
             <div class="form-group row">
                 <label class="control-label col-lg-3" for="always_display">
@@ -219,7 +246,7 @@
                         <label>
                             <input type="checkbox" name="always_display"
                                 id="always_display" value="1"
-                                {if is_null($display_opts) || $display_opts->always_display}
+                                {if is_null($widget_opts) || $widget_opts->always_display}
                                     checked
                                 {/if}
                             />
@@ -237,8 +264,8 @@
                 </label>
                 <div class="col-lg-6 control-label">
                     <label>
-                    {if (!is_null($display_opts) && !empty($display_opts->hide_oncustom)) }
-                        {$whitelist = json_decode($display_opts->hide_oncustom)}
+                    {if (!is_null($widget_opts) && !empty($widget_opts->hide_oncustom)) }
+                        {$whitelist = json_decode($widget_opts->hide_oncustom)}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                     {else}
                         <textarea class="hide_specific" name="hide_oncustom" id="hide_oncustom" cols="30" rows="10"></textarea>
@@ -293,7 +320,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onfrontpage"
                                 id="show_onfrontpage" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onfrontpage}
+                                {if !is_null($widget_opts) && $widget_opts->show_onfrontpage}
                                     checked
                                 {/if}
                             />
@@ -314,7 +341,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_oncategory"
                                 id="show_oncategory" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_oncategory}
+                                {if !is_null($widget_opts) && $widget_opts->show_oncategory}
                                     checked
                                 {/if}
                             />
@@ -335,7 +362,7 @@
                         <label>
                             <input class="show_specific" type="checkbox" name="show_onproduct"
                                 id="show_onproduct" value="1"
-                                {if !is_null($display_opts) && $display_opts->show_onproduct}
+                                {if !is_null($widget_opts) && $widget_opts->show_onproduct}
                                     checked
                                 {/if}
                             />
@@ -354,8 +381,8 @@
                 <div class="col-lg-9">
                     <div class="text">
                         <label>
-                        {if (!is_null($display_opts) && !empty($display_opts->show_oncustom)) }
-                            {$whitelist = json_decode($display_opts->show_oncustom)}
+                        {if (!is_null($widget_opts) && !empty($widget_opts->show_oncustom)) }
+                            {$whitelist = json_decode($widget_opts->show_oncustom)}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10">{foreach from=$whitelist item=page}{$page|escape:'htmlall':'UTF-8'|cat:"\r\n"}{/foreach}</textarea>
                         {else}
                             <textarea class="show_specific" name="show_oncustom" id="show_oncustom" cols="30" rows="10"></textarea>
@@ -398,7 +425,8 @@
             </div>
         </div>
         <div class="panel-footer">
-            <div id="optionsSuccessMessage" style="width: 50%; float: left; background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6; font-weight: bold; display: none;" class="alert alert-success">Successfully set widget options to your site</div>
+            <div id="optionsSuccessMessage" style="background-color: #dff0d8; color: #3c763d; border-color: #d6e9c6;" class="alert alert-success options-alert">Successfully set widget options to your site</div>
+            <div id="optionsFailureMessage" class="alert alert-danger options-alert"></div>
             <button type="submit" value="1" id="module_form_submit_btn" name="submitBlockCategories" class="btn btn-default pull-right">
             <i class="process-icon-save"></i> Save</button>
         </div>
@@ -419,7 +447,7 @@ jQuery(document).ready(function() {
             dataType : 'json',
             data : {
                 controller : 'AdminTawkto',
-                action : 'setVisibility',
+                action : 'setOptions',
                 ajax : true,
                 id_tab : current_id_tab,
                 pageId : $('input[name="page_id"]').val(),
@@ -431,6 +459,7 @@ jQuery(document).ready(function() {
                 if(r.success) {
                     $('#optionsSuccessMessage').toggle().delay(3000).fadeOut();
                 } else {
+                    $('#optionsFailureMessage').text(r.message).toggle().delay(3000).fadeOut();
                 }
             }
         });

@@ -35,6 +35,7 @@ class Tawkto extends Module
     public const TAWKTO_WIDGET_OPTS = 'TAWKTO_WIDGET_OPTS';
     public const TAWKTO_WIDGET_USER = 'TAWKTO_WIDGET_USER';
     public const TAWKTO_SELECTED_WIDGET = 'TAWKTO_SELECTED_WIDGET';
+    public const TAWKTO_VISITOR_SESSION = 'TAWKTO_VISITOR_SESSION';
 
     /**
      * __construct
@@ -110,13 +111,25 @@ class Tawkto extends Module
         $widgetId = $current_widget['widget_id'];
 
         $result = Configuration::get(self::TAWKTO_WIDGET_OPTS);
-        $enable_visitor_recognition = true; // default value
+        // default values
+        $enable_visitor_recognition = true;
+        $js_api_key = '';
+        $config_version = 0;
+
         if ($result) {
             $options = json_decode($result);
             $current_page = (string) $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
             if (isset($options->enable_visitor_recognition)) {
                 $enable_visitor_recognition = $options->enable_visitor_recognition;
+            }
+
+            if (isset($options->js_api_key)) {
+                $js_api_key = $options->js_api_key;
+            }
+
+            if (isset($options->config_version)) {
+                $config_version = $options->config_version;
             }
 
             // prepare visibility
@@ -168,19 +181,23 @@ class Tawkto extends Module
         }
 
         // add customer details as visitor info
-        $customer_name = null;
-        $customer_email = null;
+        $customer_name = '';
+        $customer_email = '';
+        $hash = null;
         if ($enable_visitor_recognition && !is_null($this->context->customer->id)) {
             $customer = $this->context->customer;
             $customer_name = $customer->firstname . ' ' . $customer->lastname;
             $customer_email = $customer->email;
+
+            $hash = $this->getVisitorHash($customer_email, $js_api_key, $config_version);
         }
 
         $this->context->smarty->assign([
             'widget_id' => $widgetId,
             'page_id' => $pageId,
-            'customer_name' => (!is_null($customer_name)) ? $customer_name : '',
-            'customer_email' => (!is_null($customer_email)) ? $customer_email : '',
+            'customer_name' => $customer_name,
+            'customer_email' => $customer_email,
+            'hash' => $hash,
         ]);
 
         return $this->display(__FILE__, 'widget.tpl');
@@ -282,5 +299,86 @@ class Tawkto extends Module
         }
 
         return $arr;
+    }
+
+    /**
+     * Get visitor hash
+     *
+     * @param string $email Visitor email
+     * @param string $js_api_key JS API key
+     * @param int $config_version Config version
+     *
+     * @return string|null
+     */
+    private function getVisitorHash(string $email, string $js_api_key, int $config_version)
+    {
+        if (empty($js_api_key)) {
+            return null;
+        }
+
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            session_start();
+        }
+
+        if (isset($_SESSION[self::TAWKTO_VISITOR_SESSION])) {
+            $current_session = $_SESSION[self::TAWKTO_VISITOR_SESSION];
+
+            if (isset($current_session['hash'])
+                && $current_session['email'] === $email
+                && $current_session['config_version'] === $config_version) {
+                return $current_session['hash'];
+            }
+        }
+
+        try {
+            $key = $this->getDecryptedData($js_api_key);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+
+            return null;
+        }
+
+        $hash = hash_hmac('sha256', $email, $key);
+
+        $_SESSION[self::TAWKTO_VISITOR_SESSION] = [
+            'hash' => $hash,
+            'email' => $email,
+            'config_version' => $config_version,
+        ];
+
+        return $hash;
+    }
+
+    /**
+     * Decrypt data
+     *
+     * @param string $data Data to decrypt
+     *
+     * @return string Decrypted data
+     *
+     * @throws Exception error decrypting data
+     */
+    private function getDecryptedData(string $data)
+    {
+        if (!defined('_COOKIE_KEY_')) {
+            throw new Exception('Cookie key not defined');
+        }
+
+        $decoded = base64_decode($data);
+
+        if ($decoded === false) {
+            throw new Exception('Failed to decode data');
+        }
+
+        $iv = substr($decoded, 0, 16);
+        $encrypted_data = substr($decoded, 16);
+
+        $decrypted_data = openssl_decrypt($encrypted_data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
+
+        if ($decrypted_data === false) {
+            throw new Exception('Failed to decrypt data');
+        }
+
+        return $decrypted_data;
     }
 }

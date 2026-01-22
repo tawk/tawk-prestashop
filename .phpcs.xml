@@ -17,6 +17,8 @@
 	<rule ref="Squiz.Commenting.FunctionComment">
 		<exclude name="Squiz.Commenting.FunctionComment.ParamCommentFullStop"/>
 		<exclude name="Squiz.Commenting.FunctionComment.ParamCommentNotCapital"/>
+		<exclude name="Squiz.Commenting.FunctionComment.ThrowsNoFullStop"/>
+		<exclude name="Squiz.Commenting.FunctionComment.ThrowsNotCapital"/>
 		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamName"/>
 		<exclude name="Squiz.Commenting.FunctionComment.SpacingAfterParamType"/>
 	</rule>

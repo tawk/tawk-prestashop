@@ -22,10 +22,19 @@ if (!defined('_PS_VERSION_')) {
 }
 
 /**
+ * Tawkto exception
+ */
+class TawktoException extends Exception
+{
+}
+
+/**
  * Admin settings controller
  */
 class AdminTawktoController extends ModuleAdminController
 {
+    public const NO_CHANGE = 'nochange';
+
     /**
      * __construct
      *
@@ -87,11 +96,15 @@ class AdminTawktoController extends ModuleAdminController
         $optKey = TawkTo::TAWKTO_WIDGET_OPTS;
 
         // returns 'false' if retrieved none.
-        $displayOpts = Configuration::get($optKey);
-        if (!$displayOpts) {
-            $displayOpts = null;
+        $widgetOpts = Configuration::get($optKey);
+        if (!$widgetOpts) {
+            $widgetOpts = null;
         }
-        $displayOpts = Tools::jsonDecode($displayOpts);
+        $widgetOpts = Tools::jsonDecode($widgetOpts);
+
+        if ($widgetOpts && !empty($widgetOpts->js_api_key)) {
+            $widgetOpts->js_api_key = self::NO_CHANGE;
+        }
 
         $sameUser = true; // assuming there is only one admin by default
         $empId = Configuration::get(TawkTo::TAWKTO_WIDGET_USER);
@@ -113,7 +126,7 @@ class AdminTawktoController extends ModuleAdminController
             'controller' => $this->context->link->getAdminLink('AdminTawkto'),
             'tab_id' => (int) $this->context->controller->id,
             'domain' => $domain,
-            'display_opts' => $displayOpts,
+            'widget_opts' => $widgetOpts,
             'page_id' => $pageId,
             'widget_id' => $widgetId,
             'same_user' => $sameUser,
@@ -221,8 +234,54 @@ class AdminTawktoController extends ModuleAdminController
      *
      * @return void
      */
-    public function ajaxProcessSetVisibility()
+    public function ajaxProcessSetOptions()
     {
+        $key = TawkTo::TAWKTO_WIDGET_OPTS;
+        $jsonOpts = [];
+
+        try {
+            // Process selected options
+            $jsonOpts = $this->processSetOptions(Tools::getValue('options'));
+        } catch (Exception $e) {
+            if ($e instanceof TawktoException) {
+                die(json_encode(['success' => false, 'message' => $e->getMessage()]));
+            }
+
+            die(json_encode(['success' => false, 'message' => 'An error occurred while saving options']));
+        }
+
+        // Override current options/fallback if not selected
+        $currentOpts = Configuration::get($key);
+        if (!empty($currentOpts)) {
+            $currentOpts = json_decode($currentOpts, true);
+            if (is_array($currentOpts)) {
+                $jsonOpts = array_merge($currentOpts, $jsonOpts);
+            }
+        }
+
+        if (!isset($jsonOpts['config_version'])) {
+            $jsonOpts['config_version'] = 0;
+        } else {
+            ++$jsonOpts['config_version'];
+        }
+
+        Configuration::updateValue($key, json_encode($jsonOpts));
+
+        die(json_encode(['success' => true]));
+    }
+
+    /**
+     * Process options
+     *
+     * @param string $params Selected options
+     *
+     * @return array
+     *
+     * @throws TawktoException Error processing options
+     */
+    private function processSetOptions(string $params): array
+    {
+        // default options
         $jsonOpts = [
             'always_display' => false,
 
@@ -239,40 +298,99 @@ class AdminTawktoController extends ModuleAdminController
             'show_oncustom' => json_encode([]),
 
             'enable_visitor_recognition' => false,
+            'js_api_key' => '',
         ];
 
-        $options = Tools::getValue('options');
-        if (!empty($options)) {
-            $options = explode('&', $options);
-            foreach ($options as $post) {
-                [$column, $value] = explode('=', $post);
-                switch ($column) {
-                    case 'hide_oncustom':
-                    case 'show_oncustom':
-                        // replace newlines and returns with comma, and convert to array for
-                        // saving
-                        $value = urldecode($value);
-                        $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
-                        if (!empty($value)) {
-                            $value = explode(',', $value);
-                            $jsonOpts[$column] = json_encode($value);
-                        }
-                        break;
+        if (empty($params)) {
+            return $jsonOpts;
+        }
 
-                    case 'show_onfrontpage':
-                    case 'show_oncategory':
-                    case 'show_onproduct':
-                    case 'always_display':
-                    case 'enable_visitor_recognition':
-                        $jsonOpts[$column] = ($value == 1);
+        parse_str($params, $options);
+        foreach ($options as $column => $value) {
+            switch ($column) {
+                case 'hide_oncustom':
+                case 'show_oncustom':
+                    // replace newlines and returns with comma, and convert to array for saving
+                    $value = urldecode($value);
+                    $value = str_ireplace(["\r\n", "\r", "\n"], ',', $value);
+                    if (!empty($value)) {
+                        $value = explode(',', $value);
+                        $jsonOpts[$column] = json_encode($value);
+                    }
+                    break;
+
+                case 'show_onfrontpage':
+                case 'show_oncategory':
+                case 'show_onproduct':
+                case 'always_display':
+                case 'enable_visitor_recognition':
+                    $jsonOpts[$column] = ($value == 1);
+                    break;
+
+                case 'js_api_key':
+                    if ($value === self::NO_CHANGE) {
+                        unset($jsonOpts['js_api_key']);
                         break;
-                }
+                    }
+
+                    if ($value === '') {
+                        break;
+                    }
+
+                    $value = trim($value);
+
+                    if (strlen($value) !== 40) {
+                        throw new TawktoException('Invalid API key.');
+                    }
+
+                    try {
+                        $jsonOpts['js_api_key'] = $this->encryptData($value);
+                    } catch (Exception $e) {
+                        error_log($e->getMessage());
+
+                        throw new TawktoException('Error saving Javascript API Key.');
+                    }
+
+                    break;
             }
         }
 
-        $key = TawkTo::TAWKTO_WIDGET_OPTS;
-        Configuration::updateValue($key, json_encode($jsonOpts));
+        return $jsonOpts;
+    }
 
-        die(Tools::jsonEncode(['success' => true]));
+    /**
+     * Encrypt data
+     *
+     * @param string $data Data to encrypt
+     *
+     * @return string Encrypted data
+     *
+     * @throws Exception error encrypting data
+     */
+    private function encryptData(string $data)
+    {
+        if (!defined('_COOKIE_KEY_')) {
+            throw new Exception('Cookie key not defined');
+        }
+
+        try {
+            $iv = random_bytes(16);
+        } catch (Exception $e) {
+            throw new Exception('Failed to generate IV');
+        }
+
+        $encrypted = openssl_encrypt($data, 'AES-256-CBC', _COOKIE_KEY_, 0, $iv);
+
+        if ($encrypted === false) {
+            throw new Exception('Failed to encrypt data');
+        }
+
+        $encrypted = base64_encode($iv . $encrypted);
+
+        if ($encrypted === false) {
+            throw new Exception('Failed to encode data');
+        }
+
+        return $encrypted;
     }
 }
